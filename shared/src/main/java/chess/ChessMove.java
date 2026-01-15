@@ -7,23 +7,29 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessMove {
+    public ChessPosition start_pos;
+    public ChessPosition end_pos;
+    public ChessPiece.PieceType promo_piece;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
+        start_pos = startPosition;
+        end_pos = endPosition;
+        promo_piece = promotionPiece;
     }
 
     /**
      * @return ChessPosition of starting location
      */
     public ChessPosition getStartPosition() {
-        throw new RuntimeException("Not implemented");
+        return start_pos;
     }
 
     /**
      * @return ChessPosition of ending location
      */
     public ChessPosition getEndPosition() {
-        throw new RuntimeException("Not implemented");
+        return end_pos;
     }
 
     /**
@@ -33,6 +39,11 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {
+
         throw new RuntimeException("Not implemented");
+        //what does good mean? == 'if pawn lands on the final row'
+        if (end_pos == good){return promo_piece;}
+        else{return null;}
+        
     }
 }
