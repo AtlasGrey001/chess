@@ -9,6 +9,8 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
+    public TeamColor team_turn;
+    public ChessBoard game_board;
 
     public ChessGame() {
 
@@ -18,7 +20,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return team_turn;
     }
 
     /**
@@ -27,7 +29,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
+        this.team_turn = team;
     }
 
     /**
@@ -47,6 +49,10 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         throw new RuntimeException("Not implemented");
+        //ChessPiece piece = game_board.getPiece(start_pos);
+        //Collection<ChessMove> good_moves = new ArrayList<>();
+        //other stuff
+        //return good_moves;
     }
 
     /**
@@ -57,6 +63,12 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         throw new RuntimeException("Not implemented");
+        //ChessPiece piece = game_board.getPiece(move.getStartPosition());
+        //if (wrong){throw new InvalidMoveException("Invalid Move");}
+        //move piece and check if there is a promotion or not
+        //move to next players turn
+        //if (team_turn == TeamColor.WHITE){team_turn = TeamColor.BLACK;}
+        //else{team_turn = TeamColor.WHITE;}
     }
 
     /**
@@ -67,6 +79,8 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
+        //find king_pos
+        //for(){...}
     }
 
     /**
@@ -77,6 +91,8 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
+        //if (!isInCheck(teamColor)){return false;}
+        //else{for(){...}}
     }
 
     /**
@@ -88,6 +104,8 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         throw new RuntimeException("Not implemented");
+        //if (isInCheck(smt)){return false;}
+        //else{for(){...}}
     }
 
     /**
@@ -96,7 +114,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.game_board = board;
     }
 
     /**
@@ -105,6 +123,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return game_board;
     }
 }
