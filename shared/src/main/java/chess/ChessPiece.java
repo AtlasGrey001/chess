@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * Represents a single chess piece
@@ -8,6 +9,7 @@ import java.util.Collection;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
+//not
 public class ChessPiece {
 
     private ChessGame.TeamColor piece_color;
@@ -45,7 +47,7 @@ public class ChessPiece {
     }
 
     public boolean goodMove(Collection<ChessMove> good_moves, ChessBoard board, int row_old, int col_old, int row_new, int col_new){
-        if (row_new < 1 && row_new > 8 && col_new < 1 && col_new > 8){return false;}
+        if (row_new < 1 || row_new > 8 || col_new < 1 || col_new > 8){return false;}
 
         ChessPosition pos_new = new ChessPosition(row_new, col_new);
         ChessPiece move_to = board.getPiece(pos_new);
@@ -65,11 +67,11 @@ public class ChessPiece {
         int row_old = myPosition.getRow();
         int col_old = myPosition.getColumn();
         for (int[] square : move_tos){
-            int y = row_old + move_tos[0];
-            int x = col_old + move_tos[1];
+            int y = row_old + square[0];
+            int x = col_old + square[1];
             while (goodMove(good_moves, board, row_old, col_old, y, x) == true){
-                y = y + move_tos[0];
-                x = x + move_tos[1];
+                y += square[0];
+                x += square[1];
             }
         }
     }
@@ -140,7 +142,34 @@ public class ChessPiece {
     }
 
     public Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition){
+        Collection<ChessMove> good_moves = new ArrayList<>();
+        int y = myPosition.getRow();
+        int x = myPosition.getColumn();
+        if (this.piece_color == ChessGame.TeamColor.WHITE){
+            int move_to = 1;
+            int start_row = 2;
+            int promo_row = 8;
+        }
+        else{
+            int move_to = -1;
+            int start_row = 7;
+            int promo_row = 1;
+        }
 
+        //one jump forward
+        int move_one = y + move_to;
+        if (move_one > 0 && move_one < 9){
+            ChessPosition one_jump = new ChessPosition(move_one, x);
+            if (board.getPiece(one_jump) == null){
+                if (move_one == promo_row){
+                    //promotion
+                }
+                else{good_moves.add(new ChessMove(myPosition, one_jump, null));}
+            }
+        }
+
+        //two jump forward
+        if ()
     }
 
     /**
