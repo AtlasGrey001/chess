@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.ArrayList;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -14,7 +15,10 @@ public class ChessGame {
     private ChessBoard game_board;
 
     public ChessGame() {
-
+        game_board = new ChessBoard();
+        game_board.resetBoard();
+        //white will always go first
+        team_turn = TeamColor.WHITE;
     }
 
     /**
@@ -41,6 +45,34 @@ public class ChessGame {
         BLACK
     }
 
+    //makes a copy of the game board and returns it
+    public ChessBoard copyBoard(ChessBoard board){
+        ChessBoard board_copy = new ChessBoard();
+        for (int y = 1; y < 9; y++){
+            for (int x = 1; x < 9; x++){
+                ChessPosition pos = new ChessPosition(y,x);
+                ChessPiece piece = board.getPiece(pos);
+                if (piece != null){
+                    ChessPiece new_piece = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
+                    board_copy.addPiece(pos, new_piece);
+                }
+            }
+        }
+        return board_copy;
+    }
+
+    public void finishMove(ChessBoard board, ChessMove move){
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        ChessPiece.PieceType promo_piece = move.getPromotionPiece();
+        board.addPiece(move.getStartPosition(), null);
+
+        if (promo_piece != null){
+            ChessPiece new_piece = new ChessPiece(piece.getTeamColor(), promo_piece);
+            board.addPiece(move.getEndPosition(), new_piece);
+        }
+        else {board.addPiece(move.getEndPosition(), piece);}
+    }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -54,10 +86,13 @@ public class ChessGame {
         if (piece.getTeamColor() != team_turn){return null;}
 
         Collection<ChessMove> all_moves = piece.pieceMoves(game_board, startPosition);
-        Collection<ChessMove> not_all_moves = new ArrayList<>();
+        Collection<ChessMove> legal_moves = new ArrayList<>();
         for (ChessMove option : all_moves){
-            //.............
+            ChessBoard board_copy = copyBoard(game_board);
+            finishMove(board_copy, option);
+            if (!isInCheck(team_turn, board_copy)){legal_moves.add(option);}
         }
+        return legal_moves;
     }
 
     /**
@@ -75,13 +110,14 @@ public class ChessGame {
         }
     }
 
+    //finds the king square
     public ChessPosition kingPosition(TeamColor color, ChessBoard board){
         for (int y = 1; y < 9; y++){
             for (int x = 1; x < 8; x++){
-                ChessPosition spot = new ChessPosition(y,x);
-                ChessPiece piece = board.getPiece(spot);
+                ChessPosition pos = new ChessPosition(y,x);
+                ChessPiece piece = board.getPiece(pos);
                 if (piece != null && piece.getTeamColor() == color && piece.getPieceType() == ChessPiece.PieceType.KING){
-                    return spot;}
+                    return pos;}
             }
         }
         return null;
@@ -95,7 +131,23 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition king_pos = kingPosition(teamColor, game_board);
-        //return ............;
+        if (king_pos == null){return false;}
+
+        for (int y = 1; y < 9; y++){
+            for (int x = 1; x < 9; x++){
+                ChessPosition pos = new ChessPosition(y,x);
+                ChessPiece piece = game_board.getPiece(pos);
+                if (piece != null && game_board.getTeamColor() != teamColor){
+                    Collection<ChessMove> new_moves = piece.pieceMoves(game_board, pos);
+                    for (ChessMove option : new_moves){
+                        ChessPosition end_pos = option.getEndPosition();
+                        if (end_pos.getRow() == king_pos.getRow() && end_pos.getColumn() == king_pos.getColumn()){
+                            return true;}
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
