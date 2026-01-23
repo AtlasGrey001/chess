@@ -6,6 +6,7 @@ package chess;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
+//done
 public class ChessMove {
     private ChessPosition start_pos;
     private ChessPosition end_pos;
