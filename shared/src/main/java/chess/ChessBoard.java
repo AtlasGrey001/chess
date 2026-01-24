@@ -83,4 +83,38 @@ public class ChessBoard {
         addPiece(new ChessPosition(1, 5), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING));
         addPiece(new ChessPosition(8, 5), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING));
     }
+
+    //rewrite
+    @Override
+    public boolean equals(Object my_obj){
+        if (this == my_obj){return true;}
+        if (my_obj == null || getClass() != my_obj.getClass()){return false;}
+        ChessBoard new_obj = (ChessBoard) my_obj;
+        for (int y = 1; y < 9; y++){
+            for (int x = 1; x < 9; x++){
+                ChessPiece piece_one = this.game_board[y][x];
+                ChessPiece piece_two = new_obj.game_board[y][x];
+                if (piece_one == null && piece_two == null){continue;}
+                if (piece_one == null || piece_two == null){return false;}
+                if (!piece_one.equals(piece_two)){return false;}
+            }
+        }
+        return true;
+    }
+
+    //rewrite
+    @Override
+    public int hashCode(){
+        //we don't want 31 * 0 bc that = 0
+        int answer = 1;
+        for (int y = 1; y < 9; y++){
+            for (int x = 1; x < 9; x++){
+                ChessPiece piece = game_board[y][x];
+                int value = 0;
+                if (piece != null){value = piece.hashCode();}
+                answer = (31 * answer + value);
+            }
+        }
+        return answer;
+    }
 }
