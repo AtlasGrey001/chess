@@ -40,4 +40,29 @@ public class ChessMove {
      * @return Type of piece to promote a pawn to, or null if no promotion
      */
     public ChessPiece.PieceType getPromotionPiece() {return promo_piece;}
+
+    //rewrite
+    @Override
+    public boolean equals(Object my_obj){
+        if (this == my_obj){return true;}
+        if (my_obj == null || getClass() != my_obj.getClass()){return false;}
+        ChessMove new_obj = (ChessMove) my_obj;
+        if (!start_pos.equals(new_obj.start_pos)){return false;}
+        if (!end_pos.equals(new_obj.end_pos)){return false;}
+        if (promo_piece == null && new_obj.promo_piece == null){return true;}
+        if (promo_piece == null || new_obj.promo_piece == null){return false;}
+        boolean answer = (promo_piece == new_obj.promo_piece);
+        return answer;
+    }
+
+    //rewrite
+    @Override
+    public int hashCode(){
+        int answer = start_pos.hashCode();
+        answer = (31 * answer + end_pos.hashCode());
+        int value = 0;
+        if (promo_piece != null){value = promo_piece.hashCode();}
+        answer = (31 * answer + value);
+        return answer;
+    }
 }
