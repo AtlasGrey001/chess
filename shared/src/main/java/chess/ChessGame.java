@@ -90,7 +90,7 @@ public class ChessGame {
         for (ChessMove option : all_moves){
             ChessBoard board_copy = copyBoard(game_board);
             finishMove(board_copy, option);
-            if (!isInCheck(team_turn, board_copy)){legal_moves.add(option);}
+            if (isInCheck(team_turn) == false){legal_moves.add(option);}
         }
         return legal_moves;
     }
@@ -118,7 +118,7 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = game_board.getPiece(move.getStartPosition());
         if (piece == null){throw new InvalidMoveException("No Piece Present");}
-        if (piece.getTeamColor != team_turn){throw new InvalidMoveException("Not Your Turn");}
+        if (piece.getTeamColor() != team_turn){throw new InvalidMoveException("Not Your Turn");}
         Collection<ChessMove> legal_moves = validMoves(move.getStartPosition());
 
         boolean answer = false;
@@ -166,7 +166,7 @@ public class ChessGame {
             for (int x = 1; x < 9; x++){
                 ChessPosition pos = new ChessPosition(y,x);
                 ChessPiece piece = game_board.getPiece(pos);
-                if (piece != null && game_board.getTeamColor() != teamColor){
+                if (piece != null && piece.getTeamColor() != teamColor){
                     Collection<ChessMove> new_moves = piece.pieceMoves(game_board, pos);
                     for (ChessMove option : new_moves){
                         ChessPosition end_pos = option.getEndPosition();
