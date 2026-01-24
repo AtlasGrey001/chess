@@ -31,4 +31,20 @@ public class ChessPosition {
     public int getColumn() {
         return piece_col;
     }
+
+    //rewrite what equals means
+    @Override
+    public boolean equals(Object my_object){
+        if (this == my_object){return true;}
+        if (my_object == null || getClass() != my_object.getClass()){return false;}
+        ChessPosition new_obj = (ChessPosition) my_object;
+        boolean answer = piece_row == new_obj.piece_row && piece_col == new_obj.piece_col;
+        return answer;
+    }
+
+    //rewrite this one too
+    @Override
+    public int hashCode(){
+        return (31 * piece_row + piece_col);
+    }
 }
