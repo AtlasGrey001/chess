@@ -230,4 +230,22 @@ public class ChessPiece {
                 return my_moves;
         }
     }
+
+    //rewrite
+    @Override
+    public boolean equals(Object my_obj){
+        if (this == my_obj){return true;}
+        if (my_obj == null || getClass() != my_obj.getClass()){return false;}
+        ChessPiece new_obj = (ChessPiece) my_obj;
+        boolean answer = (piece_color == new_obj.piece_color && piece_type == new_obj.piece_type);
+        return answer;
+    }
+
+    //rewrite
+    @Override
+    public int hashCode(){
+        int answer = piece_color.hashCode();
+        answer = (31 * answer + piece_type.hashCode());
+        return answer;
+    }
 }
