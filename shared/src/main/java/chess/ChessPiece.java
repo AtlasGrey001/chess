@@ -9,15 +9,13 @@ import java.util.ArrayList;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-//done?
 public class ChessPiece {
-
-    private ChessGame.TeamColor piece_color;
-    private PieceType piece_type;
+    private ChessGame.TeamColor color;
+    private ChessPiece.PieceType ty;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-        this.piece_color = pieceColor;
-        this.piece_type = type;
+        this.color=pieceColor;
+        this.ty=type;
     }
 
     /**
@@ -36,172 +34,14 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-        return piece_color;
+        return color;
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-        return piece_type;
-    }
-
-    public boolean goodMove(Collection<ChessMove> good_moves, ChessBoard board, int row_old, int col_old, int row_new, int col_new){
-        if (row_new < 1 || row_new > 8 || col_new < 1 || col_new > 8){return false;}
-
-        ChessPosition pos_new = new ChessPosition(row_new, col_new);
-        ChessPiece move_to = board.getPiece(pos_new);
-
-        if (move_to == null){
-            good_moves.add(new ChessMove(new ChessPosition(row_old, col_old), pos_new, null));
-            return true;
-        }
-
-        if (move_to.getTeamColor() != this.piece_color){
-            good_moves.add(new ChessMove(new ChessPosition(row_old, col_old), pos_new, null));
-        }
-        return false;
-    }
-
-    public void slidingMoves(Collection<ChessMove> good_moves, ChessBoard board, ChessPosition myPosition, int[][] move_tos){
-        int row_old = myPosition.getRow();
-        int col_old = myPosition.getColumn();
-        for (int[] square : move_tos){
-            int y = row_old + square[0];
-            int x = col_old + square[1];
-            while (goodMove(good_moves, board, row_old, col_old, y, x) == true){
-                y += square[0];
-                x += square[1];
-            }
-        }
-    }
-
-    //the king piece
-    public Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition){
-        Collection<ChessMove> good_moves = new ArrayList<>();
-        int[][] move_tos = {{0,1},{0,-1},{1,0},{1,1},{1,-1},{-1,0},{-1,1},{-1,-1}};
-        int y = myPosition.getRow();
-        int x = myPosition.getColumn();
-        int a;
-        int b;
-
-        for (int[] square : move_tos){
-            a = y + square[0];
-            b = x + square[1];
-            goodMove(good_moves, board, y, x, a, b);
-        }
-        return good_moves;
-    }
-
-    //the queen
-    public Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition){
-        Collection<ChessMove> good_moves = new ArrayList<>();
-        int[][] move_tos = {{0,1},{0,-1},{1,0},{1,1},{1,-1},{-1,0},{-1,1},{-1,-1}};
-        slidingMoves(good_moves, board, myPosition, move_tos);
-        return good_moves;
-    }
-
-    //the bishop
-    public Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition){
-        Collection<ChessMove> good_moves = new ArrayList<>();
-        int[][] move_tos = {{1,1},{1,-1},{-1,1},{-1,-1}};
-        slidingMoves(good_moves, board, myPosition, move_tos);
-        return good_moves;
-    }
-
-    //the knight
-    public Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition){
-        Collection<ChessMove> good_moves = new ArrayList<>();
-        int[][] move_tos = {{1,2},{1,-2},{2,1},{2,-1},{-1,2},{-1,-2},{-2,1},{-2,-1}};
-        int y = myPosition.getRow();
-        int x = myPosition.getColumn();
-        int a;
-        int b;
-
-        for (int[] square : move_tos){
-            a = y + square[0];
-            b = x + square[1];
-            goodMove(good_moves, board, y, x, a, b);
-        }
-        return good_moves;
-    }
-
-    //the rook
-    public Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition){
-        Collection<ChessMove> good_moves = new ArrayList<>();
-        int[][] move_tos = {{0,1},{0,-1},{1,0},{-1,0}};
-        slidingMoves(good_moves, board, myPosition, move_tos);
-        return good_moves;
-    }
-
-    //the pawn
-    public Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition){
-        Collection<ChessMove> good_moves = new ArrayList<>();
-        int y = myPosition.getRow();
-        int x = myPosition.getColumn();
-        int move_to;
-        int start_row;
-        int promo_row;
-
-        if (this.piece_color == ChessGame.TeamColor.WHITE){
-            move_to = 1;
-            start_row = 2;
-            promo_row = 8;
-        }
-        else{
-            move_to = -1;
-            start_row = 7;
-            promo_row = 1;
-        }
-
-        //one jump forward
-        int one_row = y + move_to;
-        if (one_row > 0 && one_row < 9){
-            ChessPosition one_jump = new ChessPosition(one_row, x);
-            if (board.getPiece(one_jump) == null){
-                //promotion
-                if (one_row == promo_row){
-                    good_moves.add(new ChessMove(myPosition, one_jump, PieceType.QUEEN));
-                    good_moves.add(new ChessMove(myPosition, one_jump, PieceType.BISHOP));
-                    good_moves.add(new ChessMove(myPosition, one_jump, PieceType.KNIGHT));
-                    good_moves.add(new ChessMove(myPosition, one_jump, PieceType.ROOK));
-                }
-                else{good_moves.add(new ChessMove(myPosition, one_jump, null));}
-            }
-        }
-
-        //two jump forward, from start only
-        int two_row = y + (move_to * 2);
-        if (y == start_row && board.getPiece(new ChessPosition(one_row, x)) == null){
-            if (two_row > 0 && two_row < 9){
-                ChessPosition two_jump = new ChessPosition(two_row, x);
-                if (board.getPiece(two_jump) == null){
-                    good_moves.add(new ChessMove(myPosition, two_jump, null));
-                }
-            }
-        }
-
-        //capture enemy piece, and promo possible...
-        int[][] enemy_pos = {{move_to,1},{move_to,-1}};
-        for (int[] enemy : enemy_pos){
-            int y_new = y + enemy[0];
-            int x_new = x + enemy[1];
-            if ((y_new < 1 || y_new > 8 || x_new < 1 || x_new > 8) == false){
-                ChessPosition new_pos = new ChessPosition(y_new, x_new);
-                ChessPiece square = board.getPiece(new_pos);
-
-                if (square != null && square.getTeamColor() != this.piece_color){
-                    if (y_new == promo_row){
-                        good_moves.add(new ChessMove(myPosition, new_pos, PieceType.QUEEN));
-                        good_moves.add(new ChessMove(myPosition, new_pos, PieceType.BISHOP));
-                        good_moves.add(new ChessMove(myPosition, new_pos, PieceType.KNIGHT));
-                        good_moves.add(new ChessMove(myPosition, new_pos, PieceType.ROOK));
-                    }
-                    else {good_moves.add(new ChessMove(myPosition, new_pos, null));}
-                }
-            }
-        }
-        return good_moves;
+        return ty;
     }
 
     /**
@@ -212,40 +52,160 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> my_moves = new ArrayList<>();
-        switch (piece_type){
+        Collection<ChessMove> moves=new ArrayList<>();
+        switch(ty){
             case KING:
-                return kingMoves(board, myPosition);
+                return kingMoves(board,myPosition);
             case QUEEN:
-                return queenMoves(board, myPosition);
+                return queenMoves(board,myPosition);
             case BISHOP:
-                return bishopMoves(board, myPosition);
+                return bishopMoves(board,myPosition);
             case KNIGHT:
-                return knightMoves(board, myPosition);
+                return knightMoves(board,myPosition);
             case ROOK:
-                return rookMoves(board, myPosition);
+                return rookMoves(board,myPosition);
             case PAWN:
-                return pawnMoves(board, myPosition);
+                return pawnMoves(board,myPosition);
             default:
-                return my_moves;
+                return moves;
         }
     }
 
-    //rewrite
-    @Override
-    public boolean equals(Object my_obj){
-        if (this == my_obj){return true;}
-        if (my_obj == null || getClass() != my_obj.getClass()){return false;}
-        ChessPiece new_obj = (ChessPiece) my_obj;
-        boolean answer = (piece_color == new_obj.piece_color && piece_type == new_obj.piece_type);
-        return answer;
+    Collection<ChessMove> kingMoves(ChessBoard board,ChessPosition pos){
+        Collection<ChessMove> moves=new ArrayList<>();
+        int[][] gotos={{0,1},{0,-1},{1,0},{1,1},{1,-1},{-1,0},{-1,1},{-1,-1}};
+        int r=pos.getRow();int c=pos.getColumn();int a;int b;
+        for(int[] go:gotos){
+            a=r+go[0];b=c+go[1];
+            goodMoves(moves,board,r,c,a,b);
+        }
+        return moves;
     }
 
-    //rewrite
+    Collection<ChessMove> queenMoves(ChessBoard board,ChessPosition pos){
+        Collection<ChessMove> moves=new ArrayList<>();
+        int[][] gotos={{0,1},{0,-1},{1,0},{1,1},{1,-1},{-1,0},{-1,1},{-1,-1}};
+        slidingMoves(moves,board,pos,gotos);
+        return moves;
+    }
+
+    Collection<ChessMove> bishopMoves(ChessBoard board,ChessPosition pos){
+        Collection<ChessMove> moves=new ArrayList<>();
+        int[][] gotos={{1,1},{1,-1},{-1,1},{-1,-1}};
+        slidingMoves(moves,board,pos,gotos);
+        return moves;
+    }
+
+    Collection<ChessMove> knightMoves(ChessBoard board,ChessPosition pos){
+        Collection<ChessMove> moves=new ArrayList<>();
+        int[][] gotos={{1,2},{1,-2},{2,1},{2,-1},{-1,2},{-1,-2},{-2,1},{-2,-1}};
+        int r=pos.getRow(); int c=pos.getColumn();int a; int b;
+        for(int[] go:gotos){
+            a=r+go[0]; b=c+go[1];
+            goodMoves(moves,board,r,c,a,b);
+        }
+        return moves;
+    }
+
+    Collection<ChessMove> rookMoves(ChessBoard board,ChessPosition pos){
+        Collection<ChessMove> moves=new ArrayList<>();
+        int[][] gotos={{1,0},{-1,0},{0,1},{0,-1}};
+        slidingMoves(moves,board,pos,gotos);
+        return moves;
+    }
+
+    Collection<ChessMove> pawnMoves(ChessBoard board,ChessPosition pos){
+        Collection<ChessMove> moves=new ArrayList<>();
+        int r=pos.getRow(); int c=pos.getColumn();
+        int go; int start; int pro;
+        if(this.color== ChessGame.TeamColor.WHITE){
+            go=1; start=2; pro=8;
+        }
+        else{
+            go=-1; start=7; pro=1;
+        }
+        int one=r+go;
+        if (one > 0 && one < 9) {
+            ChessPosition hop=new ChessPosition(one,c);
+            if(board.getPiece(hop)==null){
+                if(one==pro){
+                    moves.add(new ChessMove(pos,hop,PieceType.QUEEN));
+                    moves.add(new ChessMove(pos,hop,PieceType.KNIGHT));
+                    moves.add(new ChessMove(pos,hop,PieceType.BISHOP));
+                    moves.add(new ChessMove(pos,hop,PieceType.ROOK));
+                }
+                else{
+                    moves.add(new ChessMove(pos,hop,null));
+                }
+            }
+        }
+        int two=r+(go*2);
+        if(r==start && board.getPiece(new ChessPosition(one,c))==null){
+            if(two>0 && two<9){
+                ChessPosition jump=new ChessPosition(two,c);
+                if(board.getPiece(jump)==null){
+                    moves.add(new ChessMove(pos,jump,null));
+                }
+            }
+        }
+        int[][] ep={{go,1},{go,-1}};
+        for(int[] e:ep){
+            int nr=r+e[0]; int nc=c+e[1];
+            if(!(nr<1 || nr>8 || nc<1 || nc>8)){
+                ChessPosition npos=new ChessPosition(nr,nc);
+                ChessPiece p= board.getPiece(npos);
+                if(p!=null && p.getTeamColor()!=this.color){
+                    if(nr==pro){
+                        moves.add(new ChessMove(pos,npos,PieceType.QUEEN));
+                        moves.add(new ChessMove(pos,npos,PieceType.KNIGHT));
+                        moves.add(new ChessMove(pos,npos,PieceType.BISHOP));
+                        moves.add(new ChessMove(pos,npos,PieceType.ROOK));
+                    }
+                    else{
+                        moves.add(new ChessMove(pos,npos,null));
+                    }
+                }
+            }
+        }
+        return moves;
+    }
+
+    public boolean goodMoves(Collection<ChessMove> moves,ChessBoard board,int or,int oc,int nr,int nc){
+        if(nr<1 || nr>8 || nc<1 || nc>8)return false;
+        ChessPosition npos=new ChessPosition(nr,nc);
+        ChessPiece np= board.getPiece(npos);
+        if(np==null){
+            moves.add(new ChessMove(new ChessPosition(or,oc),npos,null));
+            return true;
+        }
+        if(np.getTeamColor()!=this.color){
+            moves.add(new ChessMove(new ChessPosition(or,oc),npos,null));
+            return false;
+        }
+        return false;
+    }
+
+    public void slidingMoves(Collection<ChessMove> moves,ChessBoard board, ChessPosition pos, int[][] direction){
+        int or= pos.getRow(); int oc= pos.getColumn();
+        for(int[] dir:direction){
+            int nr=or+dir[0];
+            int nc=oc+dir[1];
+            while(goodMoves(moves,board,or,oc,nr,nc)){
+                nr+=dir[0]; nc+=dir[1];
+            }
+        }
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(this==o)return true;
+        if(o==null || getClass()!=o.getClass())return false;
+        ChessPiece no=(ChessPiece) o;
+        return (color==no.color && ty==no.ty);
+    }
+
     @Override
     public int hashCode(){
-        int answer = piece_color.hashCode();
-        answer = (31 * answer + piece_type.hashCode());
-        return answer;
+        return 31*color.hashCode()+ty.hashCode();
     }
 }
