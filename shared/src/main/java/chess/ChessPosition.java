@@ -6,14 +6,13 @@ package chess;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-//done
 public class ChessPosition {
-    private int piece_col;
-    private int piece_row;
+    private int r;
+    private int c;
 
     public ChessPosition(int row, int col) {
-        piece_col = col;
-        piece_row = row;
+        this.r=row;
+        this.c=col;
     }
 
     /**
@@ -21,7 +20,7 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-        return piece_row;
+        return r;
     }
 
     /**
@@ -29,22 +28,19 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        return piece_col;
+        return c;
     }
 
-    //rewrite what equals means
     @Override
-    public boolean equals(Object my_object){
-        if (this == my_object){return true;}
-        if (my_object == null || getClass() != my_object.getClass()){return false;}
-        ChessPosition new_obj = (ChessPosition) my_object;
-        boolean answer = piece_row == new_obj.piece_row && piece_col == new_obj.piece_col;
-        return answer;
+    public boolean equals(Object o){
+        if(this==o)return true;
+        if(o==null || getClass()!=o.getClass())return false;
+        ChessPosition no = (ChessPosition) o;
+        return (r==no.getRow() && c==no.getColumn());
     }
 
-    //rewrite this one too
     @Override
     public int hashCode(){
-        return (31 * piece_row + piece_col);
+        return 31*r+c;
     }
 }
