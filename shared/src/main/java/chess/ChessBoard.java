@@ -6,18 +6,12 @@ package chess;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-//done
 public class ChessBoard {
-
-    private ChessPiece[][] game_board;
+    private ChessPiece[][] myboard;
 
     public ChessBoard() {
-        game_board = new ChessPiece[8][8];
+        this.myboard = new ChessPiece[8][8];
     }
-
-    public int calcRow(ChessPosition position){return position.getRow() - 1;}
-
-    public int calcColumn(ChessPosition position){return position.getColumn() - 1;}
 
     /**
      * Adds a chess piece to the chessboard
@@ -26,10 +20,15 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        //throw new RuntimeException("Not implemented");
-        int y = calcRow(position);
-        int x = calcColumn(position);
-        game_board[y][x] = piece;
+        int r=calcRow(position); int c=calcCol(position);
+        myboard[r][c]=piece;
+    }
+
+    public int calcRow(ChessPosition pos){
+        return pos.getRow()-1;
+    }
+    public int calcCol(ChessPosition pos){
+        return pos.getColumn()-1;
     }
 
     /**
@@ -40,10 +39,8 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        //throw new RuntimeException("Not implemented");
-        int y = calcRow(position);
-        int x = calcColumn(position);
-        return game_board[y][x];
+        int r=calcRow(position); int c=calcCol(position);
+        return myboard[r][c];
     }
 
     /**
@@ -51,19 +48,7 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        //throw new RuntimeException("Not implemented");
-        //clear
-        for (int y = 0; y < 8; y++){
-            for (int x = 0; x < 8; x++){game_board[y][x] = null;}
-        }
-        //reset pieces
-        //pawn
-        for (int x = 1; x <= 8; x++){
-            addPiece(new ChessPosition(2, x), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
-            addPiece(new ChessPosition(7, x), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
-        }
-
-        ChessPiece.PieceType[] back_row = {
+        ChessPiece.PieceType[] backrow = {
                 ChessPiece.PieceType.ROOK,
                 ChessPiece.PieceType.KNIGHT,
                 ChessPiece.PieceType.BISHOP,
@@ -74,44 +59,47 @@ public class ChessBoard {
                 ChessPiece.PieceType.ROOK
         };
 
-        //rook - royals
-        for (int x = 1; x <= 8; x++){
-            addPiece(new ChessPosition(1,x), new ChessPiece(ChessGame.TeamColor.WHITE, back_row[x-1]));
-            addPiece(new ChessPosition(8,x), new ChessPiece(ChessGame.TeamColor.BLACK, back_row[x-1]));
+        for (int a = 0; a < 8; a++) {
+            for (int b = 0; b < 8; b++) {
+                myboard[a][b] = null;
+            }
+        }
+
+        for (int b = 1; b < 9; b++) {
+            addPiece(new ChessPosition(2, b), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(7, b), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(1, b), new ChessPiece(ChessGame.TeamColor.WHITE, backrow[b-1]));
+            addPiece(new ChessPosition(8, b), new ChessPiece(ChessGame.TeamColor.BLACK, backrow[b-1]));
         }
     }
 
-    //rewrite
     @Override
-    public boolean equals(Object my_obj){
-        if (this == my_obj){return true;}
-        if (my_obj == null || getClass() != my_obj.getClass()){return false;}
-        ChessBoard new_obj = (ChessBoard) my_obj;
-        for (int y = 0; y < 8; y++){
-            for (int x = 0; x < 8; x++){
-                ChessPiece piece_one = this.game_board[y][x];
-                ChessPiece piece_two = new_obj.game_board[y][x];
-                if (piece_one == null && piece_two == null){continue;}
-                if (piece_one == null || piece_two == null){return false;}
-                if (!piece_one.equals(piece_two)){return false;}
+    public boolean equals(Object o){
+        if(this==o)return true;
+        if(o==null || getClass()!=o.getClass())return false;
+        ChessBoard no = (ChessBoard) o;
+        for(int a=0;a<8;a++){
+            for(int b=0;b<8;b++){
+                ChessPiece one = this.myboard[a][b]; ChessPiece two = no.myboard[a][b];
+                if(one==null && two==null)continue;
+                if(one==null || two==null)return false;
+                if(!one.equals(two))return false;
             }
         }
         return true;
     }
 
-    //rewrite
     @Override
     public int hashCode(){
-        //we don't want 31 * 0 bc that = 0
-        int answer = 1;
-        for (int y = 0; y < 8; y++){
-            for (int x = 0; x < 8; x++){
-                ChessPiece piece = game_board[y][x];
-                int value = 0;
-                if (piece != null){value = piece.hashCode();}
-                answer = (31 * answer + value);
+        int ans=1;
+        for(int a=0;a<8;a++){
+            for(int b=0;b<8;b++){
+                ChessPiece p = myboard[a][b];
+                int val=0;
+                if(p!=null)val=p.hashCode();
+                ans=31*ans+val;
             }
         }
-        return answer;
+        return ans;
     }
-}
+    }
