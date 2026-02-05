@@ -57,6 +57,11 @@ public class ChessGame {
         Collection<ChessMove> valid=p.pieceMoves(myboard,startPosition);
         ChessGame.TeamColor mp = p.getTeamColor();
 
+        if(p.getPieceType()==ChessPiece.PieceType.KING && !p.getMoved()){
+            castleMove(legal,myboard,startPosition,1);
+            castleMove(legal,myboard,startPosition,-1);
+        }
+
         for(ChessMove move:valid){
             ChessBoard copy=copyBoard(myboard);
             finishMove(copy,move);
@@ -67,7 +72,12 @@ public class ChessGame {
 
     public void finishMove(ChessBoard board, ChessMove move){
         ChessPiece p=board.getPiece(move.getStartPosition());
+        p.setMoved();
         ChessPiece.PieceType pro=move.getPromotionPiece();
+        int r=move.getStartPosition().getRow();
+        int sc=move.getStartPosition().getColumn();
+        int ec=move.getEndPosition().getColumn();
+
         board.addPiece(move.getStartPosition(),null);
         if(pro!=null){
             ChessPiece np=new ChessPiece(p.getTeamColor(),pro);
@@ -76,6 +86,8 @@ public class ChessGame {
         else{
             board.addPiece(move.getEndPosition(),p);
         }
+
+        
     }
 
     public ChessBoard copyBoard(ChessBoard board){
@@ -243,6 +255,35 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return myboard;
+    }
+
+    public void castleMove(Collection<ChessMove> moves,ChessBoard board,ChessPosition pos,int num){
+        int r=pos.getRow(); int c=pos.getColumn();
+        ChessPiece p = board.getPiece(pos);
+        if(p==null || p.getPieceType()!=ChessPiece.PieceType.KING)return;
+        if(p.getMoved())return;
+        int side=8;
+        if(num!=1)side=1;
+        ChessPosition rpos=new ChessPosition(r,side);
+        ChessPiece rp=board.getPiece(rpos);
+        if(rp==null || rp.getPieceType()!=ChessPiece.PieceType.ROOK)return;
+        if(rp.getMoved())return;
+        int dir=num;
+        for(int b=c+dir;b!=rpos.getColumn();b+=dir){
+            if(board.getPiece(new ChessPosition(r,b))!=null)return;
+        }
+        if(isInCheck(p.getTeamColor(),board))return;
+        int midc=c+dir;
+        ChessPosition midpos=new ChessPosition(r,midc);
+        ChessBoard copy=copyBoard(board);
+        finishMove(copy,new ChessMove(pos,midpos,null));
+        if(isInCheck(p.getTeamColor(),copy))return;
+        int endc=c+2*dir;
+        ChessPosition endpos=new ChessPosition(r,endc);
+        ChessBoard second=copyBoard(board);
+        finishMove(second,new ChessMove(pos,endpos,null));
+        if(isInCheck(p.getTeamColor(),second))return;
+        moves.add(new ChessMove(pos,endpos,null));
     }
 
     @Override
