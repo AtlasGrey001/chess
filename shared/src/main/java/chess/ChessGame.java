@@ -87,7 +87,24 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(),p);
         }
 
-        
+        if(p.getPieceType()==ChessPiece.PieceType.KING){
+            if(ec==sc+2){
+                ChessPosition srook=new ChessPosition(r,8);
+                ChessPosition erook=new ChessPosition(r,6);
+                ChessPiece rook=board.getPiece(srook);
+                board.addPiece(srook,null);
+                board.addPiece(erook,rook);
+                if(rook!=null)rook.setMoved();
+            }
+            if(ec==sc-2){
+                ChessPosition srook=new ChessPosition(r,1);
+                ChessPosition erook=new ChessPosition(r,4);
+                ChessPiece rook=board.getPiece(srook);
+                board.addPiece(srook,null);
+                board.addPiece(erook,rook);
+                if(rook!=null)rook.setMoved();
+            }
+        }
     }
 
     public ChessBoard copyBoard(ChessBoard board){
