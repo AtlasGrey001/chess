@@ -12,10 +12,20 @@ import java.util.ArrayList;
 public class ChessPiece {
     private ChessGame.TeamColor color;
     private ChessPiece.PieceType ty;
+    private boolean moved;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.color=pieceColor;
         this.ty=type;
+        this.moved=false;
+    }
+
+    public boolean getMoved(){
+        return moved;
+    }
+
+    public void setMoved(){
+        moved=true;
     }
 
     /**
