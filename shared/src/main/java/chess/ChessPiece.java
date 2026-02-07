@@ -82,7 +82,11 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return pieceMoves(board,myPosition,null);
+        ChessPosition ep = null;
+        if(board.getGame()!=null){
+            ep=board.getGame().getPassant();
+        }
+        return pieceMoves(board,myPosition,ep);
     }
 
     Collection<ChessMove> kingMoves(ChessBoard board,ChessPosition pos){
