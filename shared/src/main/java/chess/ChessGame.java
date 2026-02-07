@@ -12,11 +12,17 @@ import java.util.ArrayList;
 public class ChessGame {
     private TeamColor turn;
     private ChessBoard myboard;
+    private ChessPosition passant;
 
     public ChessGame() {
         this.turn = TeamColor.WHITE;
         this.myboard=new ChessBoard();
         this.myboard.resetBoard();
+        passant=null;
+    }
+
+    public ChessPosition getPassant(){
+        return passant;
     }
 
     /**
@@ -54,7 +60,7 @@ public class ChessGame {
         ChessPiece p=myboard.getPiece(startPosition);
         Collection<ChessMove> legal=new ArrayList<>();
         if(p==null)return legal;
-        Collection<ChessMove> valid=p.pieceMoves(myboard,startPosition);
+        Collection<ChessMove> valid=p.pieceMoves(myboard,startPosition,passant);
         ChessGame.TeamColor mp = p.getTeamColor();
 
         if(p.getPieceType()==ChessPiece.PieceType.KING && !p.getMoved()){
@@ -105,6 +111,19 @@ public class ChessGame {
                 if(rook!=null)rook.setMoved();
             }
         }
+
+        if(p.getPieceType()==ChessPiece.PieceType.PAWN){
+            int srow=move.getStartPosition().getRow();
+            int scol=move.getStartPosition().getColumn();
+            int erow=move.getEndPosition().getRow();
+            int ecol=move.getEndPosition().getColumn();
+            if(scol!=ecol && board.getPiece(move.getEndPosition())==p){
+                int go=1;
+                if(p.getTeamColor()==ChessGame.TeamColor.WHITE)go=-1;
+                ChessPosition capture=new ChessPosition(erow+go,ecol);
+                board.addPiece(capture,null);
+            }
+        }
     }
 
     public ChessBoard copyBoard(ChessBoard board){
@@ -115,6 +134,7 @@ public class ChessGame {
                 ChessPiece p=board.getPiece(pos);
                 if(p!=null){
                     ChessPiece np=new ChessPiece(p.getTeamColor(),p.getPieceType());
+                    if(p.getMoved())np.setMoved();
                     copy.addPiece(pos,np);
                 }
             }
@@ -129,7 +149,8 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessPiece p= myboard.getPiece(move.getStartPosition());
+        passant=null;
+        ChessPiece p=myboard.getPiece(move.getStartPosition());
         if(p==null)throw new InvalidMoveException("Null piece");
         if(p.getTeamColor()!=turn)throw new InvalidMoveException("Not turn");
 
@@ -145,6 +166,14 @@ public class ChessGame {
         if(!ans)throw new InvalidMoveException("Wrong");
         finishMove(myboard,move);
 
+        if(p.getPieceType()==ChessPiece.PieceType.PAWN){
+            int srow=move.getStartPosition().getRow();
+            int erow=move.getEndPosition().getRow();
+            if(Math.abs(erow-srow)==2){
+                int mid=(srow+erow)/2;
+                passant=new ChessPosition(mid,move.getStartPosition().getColumn());
+            }
+        }
         if(turn==TeamColor.WHITE){
             turn=TeamColor.BLACK;
         }
@@ -173,7 +202,7 @@ public class ChessGame {
                 ChessPosition pos=new ChessPosition(a,b);
                 ChessPiece p=copy.getPiece(pos);
                 if(p!=null && p.getTeamColor()!=teamColor){
-                    Collection<ChessMove> moves=p.pieceMoves(copy,pos);
+                    Collection<ChessMove> moves=p.pieceMoves(copy,pos,null);
                     for(ChessMove move:moves){
                         ChessPosition epos=move.getEndPosition();
                         if(epos.getRow()==king.getRow() && epos.getColumn()==king.getColumn())return true;
