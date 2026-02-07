@@ -18,6 +18,7 @@ public class ChessGame {
         this.turn = TeamColor.WHITE;
         this.myboard=new ChessBoard();
         this.myboard.resetBoard();
+        this.myboard.setGame(this);
         passant=null;
     }
 
@@ -113,15 +114,18 @@ public class ChessGame {
         }
 
         if(p.getPieceType()==ChessPiece.PieceType.PAWN){
-            int srow=move.getStartPosition().getRow();
             int scol=move.getStartPosition().getColumn();
             int erow=move.getEndPosition().getRow();
             int ecol=move.getEndPosition().getColumn();
-            if(scol!=ecol && board.getPiece(move.getEndPosition())==p){
+            if(passant!=null && passant.getRow()==erow && passant.getColumn()==ecol && scol!=ecol){
                 int go=1;
                 if(p.getTeamColor()==ChessGame.TeamColor.WHITE)go=-1;
                 ChessPosition capture=new ChessPosition(erow+go,ecol);
-                board.addPiece(capture,null);
+                ChessPiece side=board.getPiece(capture);
+                if(side!=null && side.getPieceType()== ChessPiece.PieceType.PAWN && side.getTeamColor()!=p.getTeamColor()){
+                    board.addPiece(capture,null);
+                }
+
             }
         }
     }
@@ -149,7 +153,6 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        passant=null;
         ChessPiece p=myboard.getPiece(move.getStartPosition());
         if(p==null)throw new InvalidMoveException("Null piece");
         if(p.getTeamColor()!=turn)throw new InvalidMoveException("Not turn");
@@ -165,6 +168,7 @@ public class ChessGame {
         }
         if(!ans)throw new InvalidMoveException("Wrong");
         finishMove(myboard,move);
+        passant=null;
 
         if(p.getPieceType()==ChessPiece.PieceType.PAWN){
             int srow=move.getStartPosition().getRow();
@@ -292,6 +296,7 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.myboard=board;
+        this.myboard.setGame(this);
     }
 
     /**
