@@ -54,14 +54,7 @@ public class ChessPiece {
         return ty;
     }
 
-    /**
-     * Calculates all the positions a chess piece can move to
-     * Does not take into account moves that are illegal due to leaving the king in
-     * danger
-     *
-     * @return Collection of valid moves
-     */
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition, ChessPosition passant){
         Collection<ChessMove> moves=new ArrayList<>();
         switch(ty){
             case KING:
@@ -75,10 +68,21 @@ public class ChessPiece {
             case ROOK:
                 return rookMoves(board,myPosition);
             case PAWN:
-                return pawnMoves(board,myPosition);
+                return pawnMoves(board,myPosition,passant);
             default:
                 return moves;
         }
+    }
+
+    /**
+     * Calculates all the positions a chess piece can move to
+     * Does not take into account moves that are illegal due to leaving the king in
+     * danger
+     *
+     * @return Collection of valid moves
+     */
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        return pieceMoves(board,myPosition,null);
     }
 
     Collection<ChessMove> kingMoves(ChessBoard board,ChessPosition pos){
@@ -124,7 +128,7 @@ public class ChessPiece {
         return moves;
     }
 
-    Collection<ChessMove> pawnMoves(ChessBoard board,ChessPosition pos){
+    Collection<ChessMove> pawnMoves(ChessBoard board,ChessPosition pos,ChessPosition passant){
         Collection<ChessMove> moves=new ArrayList<>();
         int r=pos.getRow(); int c=pos.getColumn();
         int go; int start; int pro;
@@ -174,6 +178,23 @@ public class ChessPiece {
                     else{
                         moves.add(new ChessMove(pos,npos,null));
                     }
+                }
+            }
+        }
+        if(passant!=null){
+            int nr=r+go;
+            int left=c-1;
+            int right=c+1;
+            if(left==passant.getColumn() && nr==passant.getRow()){
+                ChessPiece side=board.getPiece(new ChessPosition(r,left));
+                if(side!=null && side.getTeamColor()!=this.color && side.getPieceType()==PieceType.PAWN){
+                    moves.add(new ChessMove(pos,passant,null));
+                }
+            }
+            if(right==passant.getColumn() && nr==passant.getRow()){
+                ChessPiece side=board.getPiece(new ChessPosition(r,right));
+                if(side!=null && side.getTeamColor()!=this.color && side.getPieceType()==PieceType.PAWN){
+                    moves.add(new ChessMove(pos,passant,null));
                 }
             }
         }
