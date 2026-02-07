@@ -8,9 +8,18 @@ package chess;
  */
 public class ChessBoard {
     private ChessPiece[][] myboard;
+    private ChessGame gg;
 
     public ChessBoard() {
         this.myboard = new ChessPiece[8][8];
+    }
+
+    public void setGame(ChessGame game){
+        this.gg=game;
+    }
+
+    public ChessGame getGame(){
+        return gg;
     }
 
     /**
