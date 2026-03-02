@@ -1,11 +1,16 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public interface DataAccess {
+    final Map<Integer, ChessGame> engines = new HashMap<>();
+    
     // Clear
     void clear() throws DataAccessException;
 
@@ -23,4 +28,6 @@ public interface DataAccess {
     GameData getGame(int gameID) throws DataAccessException;
     Collection<GameData> listGames() throws DataAccessException;
     void updateGame(GameData game) throws DataAccessException;
+    default ChessGame getEngine(int gameID) throws DataAccessException {return engines.get(gameID);}
+    void updateEngine(int gameID, ChessGame engine) throws DataAccessException;
 }
