@@ -1,5 +1,7 @@
 package chess;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -8,19 +10,16 @@ package chess;
  */
 public class ChessBoard {
     private ChessPiece[][] myboard;
+    @JsonIgnore
     private ChessGame gg;
 
     public ChessBoard() {
         this.myboard = new ChessPiece[8][8];
     }
 
-    public void setGame(ChessGame game){
-        this.gg=game;
-    }
+    public void setGame(ChessGame game){this.gg=game;}
 
-    public ChessGame getGame(){
-        return gg;
-    }
+    public ChessGame getGame(){return gg;}
 
     /**
      * Adds a chess piece to the chessboard
@@ -81,6 +80,26 @@ public class ChessBoard {
             addPiece(new ChessPosition(8, b), new ChessPiece(ChessGame.TeamColor.BLACK, backrow[b-1]));
         }
     }
+
+    public ChessBoard copyWithoutGame() {
+        ChessBoard copy=new ChessBoard();
+        for (int r=1;r<=8;r++) {
+            for (int c=1;c<=8;c++) {
+                ChessPosition pos=new ChessPosition(r,c);
+                ChessPiece p=this.getPiece(pos);
+                if (p!=null) {
+                    ChessPiece np=new ChessPiece(p.getTeamColor(),p.getPieceType());
+                    if (p.getMoved()) np.setMoved();
+                    copy.addPiece(pos, np);
+                }
+            }
+        }
+        copy.setGame(null);
+        return copy;
+    }
+
+
+
 
     @Override
     public boolean equals(Object o){
