@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public interface DataAccess {
-    final Map<Integer, ChessGame> engines = new HashMap<>();
+    Map<Integer, ChessGame> engines = new HashMap<>();
 
     // Clear
     void clear() throws DataAccessException;
