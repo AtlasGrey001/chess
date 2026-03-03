@@ -53,7 +53,8 @@ public class GameHandler {
     }
 
     public void getGame(Context ctx)
-            throws DataAccessException, UnauthorizedException, BadRequestException, GameNotFoundException, CloneNotSupportedException {
+            throws DataAccessException, UnauthorizedException, BadRequestException,
+            GameNotFoundException, CloneNotSupportedException {
         var auth=ctx.header("authorization");
         int gameID;
         try {gameID = Integer.parseInt(ctx.pathParam("gameID"));
@@ -171,7 +172,8 @@ public class GameHandler {
     public static class ObserverRegistry {
         private final Map<Integer, Set<Session>> observers=new ConcurrentHashMap<>();
 
-        public void add(int gameID,Session session) {observers.computeIfAbsent(gameID,k->ConcurrentHashMap.newKeySet()).add(session);}
+        public void add(int gameID,Session session) {
+            observers.computeIfAbsent(gameID,k->ConcurrentHashMap.newKeySet()).add(session);}
 
         public void remove(Session session) {
             observers.values().forEach(set->set.remove(session));
@@ -194,7 +196,8 @@ public class GameHandler {
         // Get engine
         ChessGame game=gameService.getEngine(gameID);
         if (game==null) {throw new GameNotFoundException("Game Not Found");}
-        return new GetGameResult(data.gameID(),data.whiteUsername(),data.blackUsername(),data.gameName(),game.getBoard().copyWithoutGame(),game.getTeamTurn());
+        return new GetGameResult(data.gameID(),data.whiteUsername(),
+                data.blackUsername(),data.gameName(),game.getBoard().copyWithoutGame(),game.getTeamTurn());
     }
 
     private GetGameResult buildGetGameResult(GameData data)
@@ -204,6 +207,7 @@ public class GameHandler {
         // Get engine
         ChessGame game=gameService.getEngine(gameID);
         if (game==null) {throw new GameNotFoundException("Game Not Found");}
-        return new GetGameResult(data.gameID(),data.whiteUsername(),data.blackUsername(),data.gameName(),game.getBoard().copyWithoutGame(),game.getTeamTurn());
+        return new GetGameResult(data.gameID(),data.whiteUsername(),
+                data.blackUsername(),data.gameName(),game.getBoard().copyWithoutGame(),game.getTeamTurn());
     }
 }
