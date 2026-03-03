@@ -32,7 +32,7 @@ public class UserServiceTests {
         var req=new RegisterRequest("cameron","pass","email@x.com");
         userService.register(req);
 
-        assertThrows(DataAccessException.class, () -> userService.register(req));
+        assertThrows(AlreadyTakenException.class, () -> userService.register(req));
     }
 
     @Test
