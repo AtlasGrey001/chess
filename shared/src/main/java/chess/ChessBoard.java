@@ -1,7 +1,4 @@
 package chess;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -10,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class ChessBoard {
     private ChessPiece[][] myboard;
-    @JsonIgnore
     private ChessGame gg;
 
     public ChessBoard() {
