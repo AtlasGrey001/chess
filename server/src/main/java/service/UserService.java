@@ -13,7 +13,7 @@ public class UserService {
         this.dataAccess=dataAccess;
     }
 
-    public RegisterResult register(RegisterRequest request) throws DataAccessException {
+    public RegisterResult register(RegisterRequest request) throws DataAccessException, AlreadyTakenException, BadRequestException {
         if (request==null||request.username()==null||request.username().isBlank()||request.password()==null||request.password().isBlank()||request.email()==null||request.email().isBlank()) {
             throw new BadRequestException("Bad Request");}
         var existing=dataAccess.getUser(request.username());
