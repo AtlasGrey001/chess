@@ -10,8 +10,5 @@ public record GameData(int gameID,String gameName,String whiteUsername,String bl
         return new GameData(gameID,gameName,whiteUsername,username,gameOver);
     }
 
-    public GameData withGameOver(boolean over) {
-        return new GameData(gameID,gameName,whiteUsername,blackUsername,over);
-    }
-
+    public GameData withGameOver(boolean over) {return new GameData(gameID,gameName,whiteUsername,blackUsername,over);}
 }
