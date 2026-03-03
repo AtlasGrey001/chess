@@ -207,6 +207,17 @@ public class ChessGame {
         return a==b;
     }
 
+    public boolean insideHelper(ChessPiece p, TeamColor teamColor, ChessPosition pos, ChessPosition king, ChessBoard copy){
+        if(p!=null&&p.getTeamColor()!=teamColor){
+            Collection<ChessMove> moves=p.pieceMoves(copy,pos,null);
+            for(ChessMove move:moves){
+                ChessPosition epos=move.getEndPosition();
+                if(epos.getRow()==king.getRow()&&epos.getColumn()==king.getColumn()){return true;}
+            }
+        }
+        return false;
+    }
+
     public boolean isInCheck(TeamColor teamColor, ChessBoard copy){
         ChessPosition king=kingPos(teamColor,copy);
         if(king==null){return false;}
@@ -214,12 +225,9 @@ public class ChessGame {
             for(int b=1;b<9;b++){
                 ChessPosition pos=new ChessPosition(a,b);
                 ChessPiece p=copy.getPiece(pos);
-                if(p!=null && p.getTeamColor()!=teamColor){
-                    Collection<ChessMove> moves=p.pieceMoves(copy,pos,null);
-                    for(ChessMove move:moves){
-                        ChessPosition epos=move.getEndPosition();
-                        if(epos.getRow()==king.getRow() && epos.getColumn()==king.getColumn()){return true;}
-                    }
+                boolean ans = insideHelper(p,teamColor,pos,king,copy);
+                if (ans){
+                    return true;
                 }
             }
         }
