@@ -28,7 +28,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void createGameNegative_badRequest() throws Exception {
+    void createGameNegativeBadRequest() throws Exception {
         var reg=userService.register(new RegisterRequest("cameron","pass","e"));
 
         assertThrows(BadRequestException.class, () -> gameService.createGame(new CreateGameRequest(reg.authToken(),null)));
@@ -44,7 +44,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void listGamesNegative_unauthorized() {
+    void listGamesNegativeUnauthorized() {
         assertThrows(UnauthorizedException.class, () -> gameService.listGames("fake"));
     }
 
@@ -58,7 +58,7 @@ public class GameServiceTests {
     }
 
     @Test
-    void joinGameNegative_colorTaken() throws Exception {
+    void joinGameNegativeColorTaken() throws Exception {
         var reg1=userService.register(new RegisterRequest("c1","p","e"));
         var reg2=userService.register(new RegisterRequest("c2","p","e"));
         var game=gameService.createGame(new CreateGameRequest(reg1.authToken(),"A"));
