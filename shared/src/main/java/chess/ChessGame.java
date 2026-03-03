@@ -257,23 +257,7 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         if(!isInCheck(teamColor)){return false;}
-        TeamColor lastturn=turn;
-        turn=teamColor;
-        for(int a=1;a<9;a++){
-            for(int b=1;b<9;b++){
-                ChessPosition pos=new ChessPosition(a,b);
-                ChessPiece p=myboard.getPiece(pos);
-                if(p!=null && p.getTeamColor()==teamColor){
-                    Collection<ChessMove> moves=validMoves(pos);
-                    if(moves!=null && !moves.isEmpty()){
-                        turn=lastturn;
-                        return false;
-                    }
-                }
-            }
-        }
-        turn=lastturn;
-        return true;
+        return samePath(teamColor);
     }
 
     /**
@@ -285,6 +269,10 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if(isInCheck(teamColor)){return false;}
+        return samePath(teamColor);
+    }
+
+    private boolean samePath(TeamColor teamColor) {
         TeamColor lastturn=turn;
         turn=teamColor;
         for(int a=1;a<9;a++){
