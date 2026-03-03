@@ -2,6 +2,7 @@ package server;
 
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
+import io.javalin.json.JavalinGson;
 import service.*;
 import io.javalin.Javalin;
 import io.javalin.json.JavalinJackson;
@@ -24,8 +25,12 @@ public class Server {
 
         javalin = Javalin.create(config -> {
             config.staticFiles.add("web");
-            config.jsonMapper(new JavalinJackson());
+            config.jsonMapper(new JavalinGson());
         });
+
+        // -------------------------
+        // ROUTES (Javalin 6 syntax)
+        // -------------------------
 
         // user session
         javalin.post("/session", userHandler::login);
@@ -50,6 +55,9 @@ public class Server {
             ws.onClose(gameHandler::disconnect);
         });
 
+        // -------------------------
+        // EXCEPTIONS (Javalin 6)
+        // -------------------------
         javalin.exception(BadRequestException.class, (e, ctx) -> {
             ctx.status(400).json(new ErrorResponse("Error: " + e.getMessage()));
         });
@@ -78,4 +86,3 @@ public class Server {
 
     private record ErrorResponse(String message) {}
 }
-
