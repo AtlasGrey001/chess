@@ -13,8 +13,12 @@ public class UserService {
         this.dataAccess=dataAccess;
     }
 
-    public RegisterResult register(RegisterRequest request) throws DataAccessException, AlreadyTakenException, BadRequestException {
-        if (request==null||request.username()==null||request.username().isBlank()||request.password()==null||request.password().isBlank()||request.email()==null||request.email().isBlank()) {
+    public RegisterResult register(RegisterRequest request) 
+            throws DataAccessException, AlreadyTakenException, BadRequestException {
+        if (request==null||request.username()==null
+                ||request.username().isBlank()||request.password()==null
+                ||request.password().isBlank()||request.email()==null
+                ||request.email().isBlank()) {
             throw new BadRequestException("Bad Request");}
         var existing=dataAccess.getUser(request.username());
         if (existing!=null) {throw new AlreadyTakenException("Already Taken");}
@@ -28,7 +32,11 @@ public class UserService {
 
     public LoginResult login(LoginRequest request)
             throws DataAccessException, BadRequestException, UnauthorizedException {
-        if (request==null||request.username()==null||request.username().isBlank()||request.password()==null||request.password().isBlank()) {
+        if (request==null
+                ||request.username()==null
+                ||request.username().isBlank()
+                ||request.password()==null
+                ||request.password().isBlank()) {
             throw new BadRequestException("Bad Request");}
         var user=dataAccess.getUser(request.username());
         if (user==null) {throw new UnauthorizedException("Unauthorized");}
