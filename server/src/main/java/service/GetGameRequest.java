@@ -1,3 +1,3 @@
 package service;
 
-public record GetGameRequest(String authToken, Integer gameID) {}
+public record GetGameRequest(String authToken,Integer gameID) {}
