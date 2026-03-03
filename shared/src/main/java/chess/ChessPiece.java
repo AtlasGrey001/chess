@@ -83,9 +83,7 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPosition ep = null;
-        if(board.getGame()!=null){
-            ep=board.getGame().getPassant();
-        }
+        if(board.getGame()!=null){ep=board.getGame().getPassant();}
         return pieceMoves(board,myPosition,ep);
     }
 
