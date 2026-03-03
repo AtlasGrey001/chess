@@ -23,8 +23,8 @@ public class GameServiceTests {
         var reg=userService.register(new RegisterRequest("cameron","pass","e"));
         var res=gameService.createGame(new CreateGameRequest(reg.authToken(),"MyGame"));
 
-        assertTrue(res.game_ID() > 0);
-        assertNotNull(dao.getGame(res.game_ID()));
+        assertTrue(res.gameID() > 0);
+        assertNotNull(dao.getGame(res.gameID()));
     }
 
     @Test
@@ -52,9 +52,9 @@ public class GameServiceTests {
     void joinGamePositive() throws Exception {
         var reg=userService.register(new RegisterRequest("cameron","pass","e"));
         var game=gameService.createGame(new CreateGameRequest(reg.authToken(),"A"));
-        gameService.joinGame(new JoinGameRequest(reg.authToken(),"WHITE",game.game_ID()));
+        gameService.joinGame(new JoinGameRequest(reg.authToken(),game.gameID(), "WHITE"));
 
-        assertEquals("cameron",dao.getGame(game.game_ID()).white_username());
+        assertEquals("cameron",dao.getGame(game.gameID()).whiteUsername());
     }
 
     @Test
@@ -62,8 +62,8 @@ public class GameServiceTests {
         var reg1=userService.register(new RegisterRequest("c1","p","e"));
         var reg2=userService.register(new RegisterRequest("c2","p","e"));
         var game=gameService.createGame(new CreateGameRequest(reg1.authToken(),"A"));
-        gameService.joinGame(new JoinGameRequest(reg1.authToken(),"WHITE",game.game_ID()));
+        gameService.joinGame(new JoinGameRequest(reg1.authToken(),game.gameID(),"WHITE"));
 
-        assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(new JoinGameRequest(reg2.authToken(), "WHITE", game.game_ID())));
+        assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(new JoinGameRequest(reg2.authToken(), game.gameID(),"WHITE")));
     }
 }
