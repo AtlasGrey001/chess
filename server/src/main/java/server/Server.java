@@ -27,10 +27,6 @@ public class Server {
             config.jsonMapper(new JavalinJackson());
         });
 
-        // -------------------------
-        // ROUTES (Javalin 6 syntax)
-        // -------------------------
-
         // user session
         javalin.post("/session", userHandler::login);
         javalin.delete("/session", userHandler::logout);
@@ -54,9 +50,6 @@ public class Server {
             ws.onClose(gameHandler::disconnect);
         });
 
-        // -------------------------
-        // EXCEPTIONS (Javalin 6)
-        // -------------------------
         javalin.exception(BadRequestException.class, (e, ctx) -> {
             ctx.status(400).json(new ErrorResponse("Error: " + e.getMessage()));
         });
@@ -85,3 +78,4 @@ public class Server {
 
     private record ErrorResponse(String message) {}
 }
+
