@@ -11,31 +11,31 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class MemoryDataAccess implements DataAccess {
-    private final Map<String,UserData> users=new HashMap<>();
+    private final Map<String,UserData> USERS=new HashMap<>();
     private final Map<String,AuthData> authTokens=new HashMap<>();
-    private final Map<Integer,GameData> games=new HashMap<>();
-    private final Map<Integer, ChessGame> engines=new HashMap<>();
+    private final Map<Integer,GameData> GAMES=new HashMap<>();
+    private final Map<Integer, ChessGame> ENGINES=new HashMap<>();
     private int nextGameID=1;
     private final Gson gson=new Gson();
 
     @Override
     public void clear() {
-        users.clear();
+        USERS.clear();
         authTokens.clear();
-        games.clear();
-        engines.clear();
+        GAMES.clear();
+        ENGINES.clear();
         nextGameID=1;
     }
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
-        if (users.containsKey(user.username())) {throw new DataAccessException("User already exists");}
-        users.put(user.username(),user);
+        if (USERS.containsKey(user.username())) {throw new DataAccessException("User already exists");}
+        USERS.put(user.username(),user);
     }
 
     @Override
     public UserData getUser(String username) {
-        return users.get(username);
+        return USERS.get(username);
     }
 
     @Override
@@ -57,25 +57,25 @@ public class MemoryDataAccess implements DataAccess {
     public GameData createGame(String gameName) {
         int id=nextGameID++;
         GameData data=new GameData(id,gameName,null,null,false);
-        games.put(id, data);
-        engines.put(id,new ChessGame());
+        GAMES.put(id, data);
+        ENGINES.put(id,new ChessGame());
         return data;
     }
 
     @Override
     public GameData getGame(int gameID) {
-        return games.get(gameID);
+        return GAMES.get(gameID);
     }
 
     @Override
     public Collection<GameData> listGames() {
-        return games.values();
+        return GAMES.values();
     }
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
-        if (!games.containsKey(game.gameID())) {throw new DataAccessException("Game does not exist");}
-        games.put(game.gameID(),game);
+        if (!GAMES.containsKey(game.gameID())) {throw new DataAccessException("Game does not exist");}
+        GAMES.put(game.gameID(),game);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public ChessGame getEngine(int gameID) throws DataAccessException {
-        ChessGame engine=engines.get(gameID);
+        ChessGame engine=ENGINES.get(gameID);
         if (engine==null) {throw new DataAccessException("Engine does not exist for game "+gameID);}
         return engine;
     }
