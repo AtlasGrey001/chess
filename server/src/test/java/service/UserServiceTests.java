@@ -28,7 +28,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void registerNegative_usernameTaken() throws Exception {
+    void registerNegativeUsernameTaken() throws Exception {
         var req=new RegisterRequest("cameron","pass","email@x.com");
         userService.register(req);
 
@@ -46,7 +46,7 @@ public class UserServiceTests {
     }
 
     @Test
-    void loginNegative_badPassword() throws Exception {
+    void loginNegativeBadPassword() throws Exception {
         userService.register(new RegisterRequest("cameron","pass","e"));
 
         assertThrows(UnauthorizedException.class, () -> userService.login(new LoginRequest("cameron", "wrong")));
@@ -59,7 +59,7 @@ public class UserServiceTests {
         assertNull(dao.getAuth(reg.authToken()));
     }
 
-    @Test void logoutNegative_invalidToken() {
+    @Test void logoutNegativeInvalidToken() {
         assertThrows(UnauthorizedException.class,() -> userService.logout(new LogoutRequest("fake-token")) );
     }
 }
