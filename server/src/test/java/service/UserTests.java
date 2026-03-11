@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import dataaccess.MySQLDataAccess;
 import model.AuthData;
 import model.UserData;
@@ -23,6 +24,21 @@ public class UserTests {
     }
 
     @Test
+    void getUserPositive() throws Exception {
+        dao.createUser(new UserData("cam", "p", "e"));
+
+        UserData user = dao.getUser("cam");
+
+        assertNotNull(user);
+        assertEquals("cam", user.username());
+    }
+
+    @Test
+    void getUserNegativeNotFound() throws Exception {
+        assertNull(dao.getUser("missing"));
+    }
+
+    @Test
     void createUserNegativeDuplicate() throws Exception {
         dao.createUser(new UserData("cam", "p", "e"));
         assertThrows(dataaccess.DataAccessException.class,
@@ -30,8 +46,15 @@ public class UserTests {
     }
 
     @Test
+    void createUserNegativeNullUsername() {
+        assertThrows(DataAccessException.class,
+                () -> dao.createUser(new UserData(null, "p", "e")));
+    }
+
+
+    @Test
     void createAuthPositive() throws Exception {
-        dao.createUser(new UserData("cam", "p", "e"));   // REQUIRED
+        dao.createUser(new UserData("cam", "p", "e"));
         dao.createAuth(new AuthData("t1", "cam"));
 
         assertNotNull(dao.getAuth("t1"));
@@ -39,7 +62,7 @@ public class UserTests {
 
     @Test
     void createAuthNegativeDuplicate() throws Exception {
-        dao.createUser(new UserData("cam", "p", "e"));   // REQUIRED
+        dao.createUser(new UserData("cam", "p", "e"));
         dao.createAuth(new AuthData("t1", "cam"));
 
         assertThrows(dataaccess.DataAccessException.class,
@@ -47,8 +70,15 @@ public class UserTests {
     }
 
     @Test
+    void createAuthNegativeUserDoesNotExist() {
+        assertThrows(DataAccessException.class,
+                () -> dao.createAuth(new AuthData("t1", "ghost")));
+    }
+
+
+    @Test
     void getAuthPositive() throws Exception {
-        dao.createUser(new UserData("cam", "p", "e"));   // REQUIRED
+        dao.createUser(new UserData("cam", "p", "e"));
         dao.createAuth(new AuthData("t1", "cam"));
 
         assertEquals("cam", dao.getAuth("t1").username());
@@ -60,8 +90,19 @@ public class UserTests {
     }
 
     @Test
+    void getAuthPositiveTokenMatches() throws Exception {
+        dao.createUser(new UserData("cam", "p", "e"));
+        dao.createAuth(new AuthData("t1", "cam"));
+
+        AuthData auth = dao.getAuth("t1");
+
+        assertEquals("t1", auth.authToken());
+    }
+
+
+    @Test
     void deleteAuthPositive() throws Exception {
-        dao.createUser(new UserData("cam", "p", "e"));   // REQUIRED
+        dao.createUser(new UserData("cam", "p", "e"));
         dao.createAuth(new AuthData("t1", "cam"));
 
         dao.deleteAuth("t1");
@@ -70,12 +111,17 @@ public class UserTests {
 
     @Test
     void deleteAuthNegativeNotFound() throws Exception {
-        dao.deleteAuth("missing"); // should not throw
+        dao.deleteAuth("missing");
+    }
+
+    @Test
+    void deleteAuthNegativeNullToken() throws Exception {
+        dao.deleteAuth(null);
     }
 
     @Test
     void clearPositive() throws Exception {
-        dao.createUser(new UserData("cam", "p", "e"));   // REQUIRED
+        dao.createUser(new UserData("cam", "p", "e"));
         dao.createAuth(new AuthData("t1", "cam"));
 
         dao.clear();
@@ -85,8 +131,21 @@ public class UserTests {
     }
 
     @Test
+    void clearPositiveAllTables() throws Exception {
+        dao.createUser(new UserData("cam", "p", "e"));
+        dao.createAuth(new AuthData("t1", "cam"));
+        dao.createGame("A");
+        dao.clear();
+
+        assertNull(dao.getUser("cam"));
+        assertNull(dao.getAuth("t1"));
+        assertTrue(dao.listGames().isEmpty());
+    }
+
+
+    @Test
     void clearNegativeDoubleClear() throws Exception {
         dao.clear();
-        dao.clear(); // should not throw
+        dao.clear();
     }
 }
