@@ -7,7 +7,7 @@ package chess;
  */
 public class ChessBoard {
     private ChessPiece[][] myboard;
-    private ChessGame gg;
+    private transient ChessGame gg;
 
     public ChessBoard() {
         this.myboard = new ChessPiece[8][8];
