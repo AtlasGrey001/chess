@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public interface DataAccess {
-    Map<Integer, ChessGame> ENGINES = new HashMap<>();
+    Map<Integer,ChessGame> ENGINES=new HashMap<>();
 
     // Clear
     void clear() throws DataAccessException;
@@ -29,5 +29,5 @@ public interface DataAccess {
     Collection<GameData> listGames() throws DataAccessException;
     void updateGame(GameData game) throws DataAccessException;
     default ChessGame getEngine(int gameID) throws DataAccessException {return ENGINES.get(gameID);}
-    void updateEngine(int gameID, ChessGame engine) throws DataAccessException;
+    void updateEngine(int gameID,ChessGame engine) throws DataAccessException;
 }
