@@ -3,13 +3,18 @@ package server;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
-import io.javalin.websocket.WsCloseContext;
-import io.javalin.websocket.WsConnectContext;
-import io.javalin.websocket.WsMessageContext;
+import io.javalin.websocket.*;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import service.*;
 import dataaccess.DataAccessException;
+import service.exceptions.AlreadyTakenException;
+import service.exceptions.BadRequestException;
+import service.exceptions.GameNotFoundException;
+import service.exceptions.UnauthorizedException;
+import service.requests.CreateGameRequest;
+import service.requests.JoinGameRequest;
+import service.results.GetGameResult;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,47 +28,114 @@ public class GameHandler {
         this.gameService=gameService;
     }
 
-    public void createGame(Context ctx)
-            throws DataAccessException, BadRequestException, UnauthorizedException {
-        var auth=ctx.header("authorization");
-        var body=gson.fromJson(ctx.body(),CreateGameRequest.class);
-        if (body==null||body.gameName()==null||body.gameName().isBlank()) {throw new BadRequestException("Bad Request");}
-        var request=new CreateGameRequest(auth,body.gameName());
-        var result=gameService.createGame(request);
-        ctx.status(200);
-        ctx.json(result);
+    public void createGame(Context ctx) {
+        try {
+            var rawAuth=ctx.header("authorization");
+            var auth = rawAuth == null ? null : rawAuth.replace("\"", "").trim();
+            if (auth==null || auth.isBlank()) {
+                ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+                return;
+            }
+
+            var body=gson.fromJson(ctx.body(),CreateGameRequest.class);
+            if (body==null || body.gameName()==null || body.gameName().isBlank()) {
+                ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+                return;
+            }
+
+            var request=new CreateGameRequest(auth,body.gameName());
+            var result=gameService.createGame(request);
+            ctx.status(200).json(result);
+        } catch (UnauthorizedException e) {
+            ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+        } catch (BadRequestException e) {
+            ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+        } catch (DataAccessException e) {
+            ctx.status(500).json(new ErrorResponse("Error: "+e.getMessage()));
+        }
     }
 
-    public void listGames(Context ctx)
-            throws DataAccessException, UnauthorizedException {
-        var auth=ctx.header("authorization");
-        var result=gameService.listGames(auth);
-        ctx.status(200);
-        ctx.json(result);
+    public void listGames(Context ctx) {
+        try {
+            var rawAuth=ctx.header("authorization");
+            var auth = rawAuth == null ? null : rawAuth.replace("\"", "").trim();
+            if (auth==null || auth.isBlank()) {
+                ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+                return;
+            }
+
+            var result=gameService.listGames(auth);
+            ctx.status(200).json(result);
+        } catch (UnauthorizedException e) {
+            ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+        } catch (DataAccessException e) {
+            ctx.status(500).json(new ErrorResponse("Error: " + e.getMessage()));
+        }
     }
 
-    public void joinGame(Context ctx)
-            throws DataAccessException, BadRequestException, UnauthorizedException, AlreadyTakenException {
-        var auth=ctx.header("authorization");
-        var body=gson.fromJson(ctx.body(),JoinGameRequest.class);
-        var request=new JoinGameRequest(auth,body.gameID(),body.playerColor());
-        gameService.joinGame(request);
-        ctx.status(200);
-        ctx.result("{}");
+    public void joinGame(Context ctx) {
+        try {
+            var rawAuth=ctx.header("authorization");
+            var auth = rawAuth == null ? null : rawAuth.replace("\"", "").trim();
+            if (auth==null || auth.isBlank()) {
+                ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+                return;
+            }
+
+            var body=gson.fromJson(ctx.body(), JoinGameRequest.class);
+            if (body==null || body.gameID()==null || body.playerColor()==null || body.playerColor().isBlank()) {
+                ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+                return;
+            }
+
+            var request=new JoinGameRequest(auth,body.gameID(),body.playerColor());
+            gameService.joinGame(request);
+            ctx.status(200).json(new Object());
+        } catch (AlreadyTakenException e) {
+            ctx.status(403).json(new ErrorResponse("Error: Already Taken"));
+        } catch (UnauthorizedException e) {
+            ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+        } catch (BadRequestException e) {
+            ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+        } catch (DataAccessException e) {
+            ctx.status(500).json(new ErrorResponse("Error: "+e.getMessage()));
+        }
     }
 
-    public void getGame(Context ctx)
-            throws DataAccessException, UnauthorizedException, BadRequestException,
-            GameNotFoundException, CloneNotSupportedException {
-        var auth=ctx.header("authorization");
-        int gameID;
-        try {gameID = Integer.parseInt(ctx.pathParam("gameID"));
-        } catch (NumberFormatException e) {
-            throw new BadRequestException("Bad Request");}
-        if (gameID<=0) {throw new BadRequestException("Bad Request");}
-        var result=buildGetGameResult(auth,gameID);
-        ctx.status(200);
-        ctx.json(result);
+    public void getGame(Context ctx) {
+        try {
+            var rawAuth=ctx.header("authorization");
+            var auth = rawAuth == null ? null : rawAuth.replace("\"", "").trim();
+            if (auth==null || auth.isBlank()) {
+                ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+                return;
+            }
+
+            int gameID;
+            try {
+                gameID=Integer.parseInt(ctx.pathParam("gameID"));
+            } catch (NumberFormatException e) {
+                ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+                return;
+            }
+
+            if (gameID<=0) {
+                ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+                return;
+            }
+            var result=buildGetGameResult(auth,gameID);
+            ctx.status(200).json(result);
+        } catch (UnauthorizedException e) {
+            ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+        } catch (GameNotFoundException e) {
+            ctx.status(400).json(new ErrorResponse("Error: Game Not Found"));
+        } catch (BadRequestException e) {
+            ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+        } catch (DataAccessException e) {
+            ctx.status(500).json(new ErrorResponse("Error: "+e.getMessage()));
+        } catch (CloneNotSupportedException e) {
+            ctx.status(500).json(new ErrorResponse("Error: Internal Error"));
+        }
     }
 
     public void observeGame(WsConnectContext ctx) {
@@ -73,9 +145,10 @@ public class GameHandler {
                 ctx.session.close(1008,"Unauthorized");
                 return;
             }
+
             var auth=gameService.validateAuth(token);
             int gameID;
-            try {gameID = Integer.parseInt(ctx.pathParam("gameID"));
+            try {gameID=Integer.parseInt(ctx.pathParam("gameID"));
             } catch (NumberFormatException e) {
                 ctx.session.close(1008,"Bad Request");
                 return;
@@ -91,8 +164,8 @@ public class GameHandler {
             }
             observerRegistry.add(gameID,ctx.session);
             ctx.send(gson.toJson(buildGetGameResult(data)));
-        } catch (UnauthorizedException e) {ctx.session.close(1008, "Unauthorized");
-        } catch (Exception e) {ctx.session.close(1011, "Internal Error");}
+        } catch (UnauthorizedException e) {ctx.session.close(1008,"Unauthorized");
+        } catch (Exception e) {ctx.session.close(1011,"Internal Error");}
     }
 
     public void disconnect(WsCloseContext ctx) {
@@ -102,12 +175,12 @@ public class GameHandler {
     public void receiveMessage(WsMessageContext ctx) {
         try {
             var msg=gson.fromJson(ctx.message(),WSMessage.class);
-            if (msg==null||msg.type()==null) {
+            if (msg==null || msg.type()==null) {
                 ctx.session.close(1008,"Bad Request");
                 return;
             }
             switch (msg.type()) {
-                case "makeMove"->handleMakeMove(ctx, msg);
+                case "makeMove"->handleMakeMove(ctx,msg);
                 case "resign"->handleResign(ctx,msg);
                 case "leave"->handleLeave(ctx,msg);
                 default->ctx.session.close(1008,"Bad Request");
@@ -118,7 +191,7 @@ public class GameHandler {
     private void handleMakeMove(WsMessageContext ctx,WSMessage msg) {
         try {
             String token=ctx.queryParam("token");
-            if (token==null||token.isBlank()) {
+            if (token==null || token.isBlank()) {
                 ctx.session.close(1008,"Unauthorized");
                 return;
             }
@@ -152,8 +225,8 @@ public class GameHandler {
             }
             var updated=gameService.resign(auth,gameID);
             broadcast(gameID, buildGetGameResult(updated));
-        } catch (UnauthorizedException e) {ctx.session.close(1008, "Unauthorized");
-        } catch (Exception e) {ctx.session.close(1011, "Internal Error");}
+        } catch (UnauthorizedException e) {ctx.session.close(1008,"Unauthorized");
+        } catch (Exception e) {ctx.session.close(1011,"Internal Error");}
     }
 
     private void handleLeave(WsMessageContext ctx,WSMessage msg) {
@@ -170,7 +243,7 @@ public class GameHandler {
     }
 
     public static class ObserverRegistry {
-        private final Map<Integer, Set<Session>> observers=new ConcurrentHashMap<>();
+        private final Map<Integer,Set<Session>> observers=new ConcurrentHashMap<>();
 
         public void add(int gameID,Session session) {
             observers.computeIfAbsent(gameID,k->ConcurrentHashMap.newKeySet()).add(session);}
@@ -184,7 +257,7 @@ public class GameHandler {
         }
     }
 
-    private GetGameResult buildGetGameResult(String auth,int gameID)
+    private GetGameResult buildGetGameResult(String auth, int gameID)
             throws UnauthorizedException, GameNotFoundException, DataAccessException, CloneNotSupportedException {
         // Validate auth
         gameService.validateAuth(auth);
@@ -201,7 +274,7 @@ public class GameHandler {
     }
 
     private GetGameResult buildGetGameResult(GameData data)
-            throws GameNotFoundException, CloneNotSupportedException, DataAccessException {
+            throws GameNotFoundException, DataAccessException {
         int gameID=data.gameID();
 
         // Get engine
