@@ -34,9 +34,7 @@ public class MemoryDataAccess implements DataAccess {
     }
 
     @Override
-    public UserData getUser(String username) {
-        return USERS.get(username);
-    }
+    public UserData getUser(String username) {return USERS.get(username);}
 
     @Override
     public void createAuth(AuthData auth) {
@@ -57,7 +55,7 @@ public class MemoryDataAccess implements DataAccess {
     public GameData createGame(String gameName) {
         int id=nextGameID++;
         GameData data=new GameData(id,gameName,null,null,false);
-        GAMES.put(id, data);
+        GAMES.put(id,data);
         ENGINES.put(id,new ChessGame());
         return data;
     }
