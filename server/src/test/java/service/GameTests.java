@@ -35,6 +35,13 @@ public class GameTests {
     }
 
     @Test
+    void createGameNegativeEmptyNameAllowed() throws Exception {
+        GameData game = dao.createGame("");
+        assertNotNull(game);
+        assertEquals("", game.gameName());
+    }
+
+    @Test
     void getGamePositive() throws Exception {
         GameData created = dao.createGame("A");
         GameData found = dao.getGame(created.gameID());
@@ -61,6 +68,16 @@ public class GameTests {
     void listGamesNegativeEmpty() throws Exception {
         assertTrue(dao.listGames().isEmpty());
     }
+
+    @Test
+    void listGamesNegativeAfterClear() throws Exception {
+        dao.createGame("A");
+        dao.createGame("B");
+        dao.clear();
+
+        assertTrue(dao.listGames().isEmpty());
+    }
+
 
     @Test
     void updateGamePositive() throws Exception {
@@ -95,6 +112,22 @@ public class GameTests {
     }
 
     @Test
+    void updateGameNegativeNullName() throws Exception {
+        GameData created = dao.createGame("A");
+        GameData bad = new GameData(
+                created.gameID(),
+                null,
+                null,
+                null,
+                false
+        );
+
+        assertThrows(DataAccessException.class,
+                () -> dao.updateGame(bad));
+    }
+
+
+    @Test
     void updateEnginePositive() throws Exception {
         GameData created = dao.createGame("A");
 
@@ -110,6 +143,21 @@ public class GameTests {
 
         assertThrows(DataAccessException.class,
                 () -> dao.updateEngine(9999, engine));
+    }
+
+    @Test
+    void getEnginePositive() throws Exception {
+        GameData game = dao.createGame("A");
+        ChessGame engine = dao.getEngine(game.gameID());
+
+        assertNotNull(engine);
+        assertEquals(new ChessGame(), engine);
+    }
+
+    @Test
+    void getEngineNegativeNotFound() {
+        assertThrows(DataAccessException.class,
+                () -> dao.getEngine(9999));
     }
 
     @Test
