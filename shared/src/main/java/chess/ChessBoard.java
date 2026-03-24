@@ -1,4 +1,7 @@
 package chess;
+
+import static chess.ChessGame.extracted;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -85,11 +88,7 @@ public class ChessBoard {
             for (int c=1;c<=8;c++) {
                 ChessPosition pos=new ChessPosition(r,c);
                 ChessPiece p=this.getPiece(pos);
-                if (p!=null) {
-                    ChessPiece np=new ChessPiece(p.getTeamColor(),p.getPieceType());
-                    if (p.getMoved()) {np.setMoved();}
-                    copy.addPiece(pos, np);
-                }
+                extracted(p, copy, pos);
             }
         }
         copy.setGame(null);
