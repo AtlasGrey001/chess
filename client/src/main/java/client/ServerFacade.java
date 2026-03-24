@@ -45,8 +45,7 @@ public class ServerFacade {
                   "gameName": "%s"
                 }
                 """.formatted(gameName);
-        var response=makeRequest("POST","/game",body,authToken,CreateGameResponse.class);
-        return response.game();
+        return makeRequest("POST","/game",body,authToken,GameData.class);
     }
 
     public void joinGame(String authToken,int gameId,String color) throws Exception {
@@ -90,6 +89,9 @@ public class ServerFacade {
         // Read bytes directly from input
         String json;
         try (stream) {json=new String(stream.readAllBytes());}
+
+        //System.out.println("DEBUG JSON = "+json);
+
         if (status>=200 && status<300) {return JsonUtil.fromJson(json, responseClass);}
         else {throw new RuntimeException("Server error: "+json);}
     }
