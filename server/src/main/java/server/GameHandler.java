@@ -31,12 +31,11 @@ public class GameHandler {
     public void createGame(Context ctx) {
         try {
             var rawAuth=ctx.header("authorization");
-            var auth = rawAuth == null ? null : rawAuth.replace("\"", "").trim();
+            var auth=rawAuth==null ? null : rawAuth.replace("\"","").trim();
             if (auth==null || auth.isBlank()) {
                 ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
                 return;
             }
-
             var body=gson.fromJson(ctx.body(),CreateGameRequest.class);
             if (body==null || body.gameName()==null || body.gameName().isBlank()) {
                 ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
@@ -44,8 +43,10 @@ public class GameHandler {
             }
 
             var request=new CreateGameRequest(auth,body.gameName());
-            var result=gameService.createGame(request);
-            ctx.status(200).json(result);
+            var gameID=gameService.createGame(request);
+            GameData gameData=gameService.getGameMetadata(gameID.gameID());
+            ctx.status(200).json(gameData);
+
         } catch (UnauthorizedException e) {
             ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
         } catch (BadRequestException e) {
