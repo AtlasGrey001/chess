@@ -136,14 +136,18 @@ public class ChessGame {
             for(int b=1;b<9;b++){
                 ChessPosition pos=new ChessPosition(a,b);
                 ChessPiece p=board.getPiece(pos);
-                if(p!=null){
-                    ChessPiece np=new ChessPiece(p.getTeamColor(),p.getPieceType());
-                    if(p.getMoved()){np.setMoved();}
-                    copy.addPiece(pos,np);
-                }
+                extracted(p, copy, pos);
             }
         }
         return copy;
+    }
+
+    static void extracted(ChessPiece p, ChessBoard copy, ChessPosition pos) {
+        if(p !=null){
+            ChessPiece np=new ChessPiece(p.getTeamColor(), p.getPieceType());
+            if(p.getMoved()){np.setMoved();}
+            copy.addPiece(pos,np);
+        }
     }
 
     /**
