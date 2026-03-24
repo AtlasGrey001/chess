@@ -16,43 +16,51 @@ public class ClientMain {
 
         while (true) {
             try {
-                if (state.mode()==ClientState.Mode.PRELOADING) {
-                    System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN+"[prelogin] >>> "+EscapeSequences.RESET_TEXT_COLOR);
-                    String input=scanner.nextLine().trim().toLowerCase();
-                    switch (input) {
-                        case "help"-> printPreloadingHelp();
-                        case "quit"->{
-                            System.out.println("Goodbye.");
-                            return;
-                        }
-                        case "login"->doLogin(scanner,facade,state);
-                        case "register"->doRegister(scanner,facade,state);
-                        default->System.out.println("Unknown command. Type 'help'.");
-                    }
-                } else {
-                    System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE+"[postlogin] >>> "+EscapeSequences.RESET_TEXT_COLOR);
-                    String input=scanner.nextLine().trim().toLowerCase();
-                    switch (input) {
-                        case "help"->printPostloginHelp();
-                        case "logout"->{
-                            facade.logout(state.authToken());
-                            state.logout();
-                            System.out.println("Logged out.");
-                        }
-                        case "create game"->gameMenu.createGame();
-                        case "list games"->gameMenu.listGames();
-                        case "play game"->gameMenu.playGame();
-                        case "observe game"->gameMenu.observeGame();
-                        case "quit"->{
-                            System.out.println("Goodbye.");
-                            return;
-                        }
-                        default->System.out.println("Unknown command. Type 'help'.");
-                    }
-                }
+                if (state.mode()==ClientState.Mode.PRELOADING) {handlePreloading(scanner,facade,state,gameMenu);}
+                else {handlePostlogin(scanner,facade,state,gameMenu);}
             } catch (Exception ex) {
                 System.out.println("Error: "+ex.getMessage());
             }
+        }
+    }
+
+    private static void handlePreloading(Scanner scanner, ServerFacade facade,
+                                         ClientState state, GameMenu gameMenu) throws Exception {
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN+"[preloading] >>> "+EscapeSequences.RESET_TEXT_COLOR);
+        String input=scanner.nextLine().trim().toLowerCase();
+        switch (input) {
+            case "help"-> printPreloadingHelp();
+            case "quit"->{
+                System.out.println("Goodbye.");
+                return;
+            }
+            case "login"->doLogin(scanner,facade,state);
+            case "register"->doRegister(scanner,facade,state);
+            default->System.out.println("Unknown command. Type 'help'.");
+        }
+
+    }
+
+    private static void handlePostlogin(Scanner scanner, ServerFacade facade,
+                                       ClientState state, GameMenu gameMenu) throws Exception {
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLUE+"[postlogin] >>> "+EscapeSequences.RESET_TEXT_COLOR);
+        String input=scanner.nextLine().trim().toLowerCase();
+        switch (input) {
+            case "help"->printPostloginHelp();
+            case "logout"->{
+                facade.logout(state.authToken());
+                state.logout();
+                System.out.println("Logged out.");
+            }
+            case "create game"->gameMenu.createGame();
+            case "list games"->gameMenu.listGames();
+            case "play game"->gameMenu.playGame();
+            case "observe game"->gameMenu.observeGame();
+            case "quit"->{
+                System.out.println("Goodbye.");
+                return;
+            }
+            default->System.out.println("Unknown command. Type 'help'.");
         }
     }
 
