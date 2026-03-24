@@ -16,7 +16,7 @@ public class ClientMain {
 
         while (true) {
             try {
-                if (state.mode()==ClientState.Mode.PRELOGIN) {
+                if (state.mode()==ClientState.Mode.PRELOADING) {
                     System.out.print(EscapeSequences.SET_TEXT_COLOR_GREEN+"[prelogin] >>> "+EscapeSequences.RESET_TEXT_COLOR);
                     String input=scanner.nextLine().trim().toLowerCase();
                     switch (input) {
