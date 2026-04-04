@@ -33,12 +33,12 @@ public class GameHandler {
             var rawAuth=ctx.header("authorization");
             var auth=rawAuth==null ? null : rawAuth.replace("\"","").trim();
             if (auth==null || auth.isBlank()) {
-                ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+                ctx.status(401).json(new ErrorResponse("Unauthorized"));
                 return;
             }
             var body=gson.fromJson(ctx.body(),CreateGameRequest.class);
             if (body==null || body.gameName()==null || body.gameName().isBlank()) {
-                ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+                ctx.status(400).json(new ErrorResponse("Bad Request"));
                 return;
             }
 
@@ -48,11 +48,11 @@ public class GameHandler {
             ctx.status(200).json(gameData);
 
         } catch (UnauthorizedException e) {
-            ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+            ctx.status(401).json(new ErrorResponse("Unauthorized"));
         } catch (BadRequestException e) {
-            ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+            ctx.status(400).json(new ErrorResponse("Bad Request"));
         } catch (DataAccessException e) {
-            ctx.status(500).json(new ErrorResponse("Error: "+e.getMessage()));
+            ctx.status(500).json(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -61,16 +61,16 @@ public class GameHandler {
             var rawAuth=ctx.header("authorization");
             var auth = rawAuth == null ? null : rawAuth.replace("\"", "").trim();
             if (auth==null || auth.isBlank()) {
-                ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+                ctx.status(401).json(new ErrorResponse("Unauthorized"));
                 return;
             }
 
             var result=gameService.listGames(auth);
             ctx.status(200).json(result);
         } catch (UnauthorizedException e) {
-            ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+            ctx.status(401).json(new ErrorResponse("Unauthorized"));
         } catch (DataAccessException e) {
-            ctx.status(500).json(new ErrorResponse("Error: " + e.getMessage()));
+            ctx.status(500).json(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -85,7 +85,7 @@ public class GameHandler {
 
             var body=gson.fromJson(ctx.body(), JoinGameRequest.class);
             if (body==null || body.gameID()==null || body.playerColor()==null || body.playerColor().isBlank()) {
-                ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+                ctx.status(400).json(new ErrorResponse("Bad Request"));
                 return;
             }
 
@@ -93,13 +93,13 @@ public class GameHandler {
             gameService.joinGame(request);
             ctx.status(200).json(new Object());
         } catch (AlreadyTakenException e) {
-            ctx.status(403).json(new ErrorResponse("Error: Already Taken"));
+            ctx.status(403).json(new ErrorResponse("Already Taken"));
         } catch (UnauthorizedException e) {
-            ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+            ctx.status(401).json(new ErrorResponse("Unauthorized"));
         } catch (BadRequestException e) {
-            ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+            ctx.status(400).json(new ErrorResponse("Bad Request"));
         } catch (DataAccessException e) {
-            ctx.status(500).json(new ErrorResponse("Error: "+e.getMessage()));
+            ctx.status(500).json(new ErrorResponse(e.getMessage()));
         }
     }
 
@@ -108,7 +108,7 @@ public class GameHandler {
             var rawAuth=ctx.header("authorization");
             var auth = rawAuth == null ? null : rawAuth.replace("\"", "").trim();
             if (auth==null || auth.isBlank()) {
-                ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+                ctx.status(401).json(new ErrorResponse("Unauthorized"));
                 return;
             }
 
@@ -116,26 +116,26 @@ public class GameHandler {
             try {
                 gameID=Integer.parseInt(ctx.pathParam("gameID"));
             } catch (NumberFormatException e) {
-                ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+                ctx.status(400).json(new ErrorResponse("Bad Request"));
                 return;
             }
 
             if (gameID<=0) {
-                ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+                ctx.status(400).json(new ErrorResponse("Bad Request"));
                 return;
             }
             var result=buildGetGameResult(auth,gameID);
             ctx.status(200).json(result);
         } catch (UnauthorizedException e) {
-            ctx.status(401).json(new ErrorResponse("Error: Unauthorized"));
+            ctx.status(401).json(new ErrorResponse("Unauthorized"));
         } catch (GameNotFoundException e) {
-            ctx.status(400).json(new ErrorResponse("Error: Game Not Found"));
+            ctx.status(400).json(new ErrorResponse("Game Not Found"));
         } catch (BadRequestException e) {
-            ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+            ctx.status(400).json(new ErrorResponse("Bad Request"));
         } catch (DataAccessException e) {
-            ctx.status(500).json(new ErrorResponse("Error: "+e.getMessage()));
+            ctx.status(500).json(new ErrorResponse(e.getMessage()));
         } catch (CloneNotSupportedException e) {
-            ctx.status(500).json(new ErrorResponse("Error: Internal Error"));
+            ctx.status(500).json(new ErrorResponse("Internal Error"));
         }
     }
 
