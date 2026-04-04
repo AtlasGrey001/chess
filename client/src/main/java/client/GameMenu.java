@@ -2,7 +2,10 @@ package client;
 
 import chess.ChessGame;
 import model.GameData;
+import org.glassfish.tyrus.client.ClientManager;
 import ui.BoardRender;
+
+import java.net.URI;
 import java.util.Scanner;
 
 public class GameMenu {
@@ -48,9 +51,14 @@ public class GameMenu {
             System.out.println("You must list games first.");
             return;
         }
-        
+
         System.out.print("Game #: ");
-        int num=Integer.parseInt(scanner.nextLine());
+        int num;
+        try{
+            num=Integer.parseInt(scanner.nextLine());
+        } catch(Exception ex){
+            num=0;
+        }
         GameData game=cache.getByIndex(num);
         System.out.print("Color (WHITE/BLACK): ");
         String color=scanner.nextLine().trim().toUpperCase();
@@ -70,13 +78,23 @@ public class GameMenu {
             return;
         }
         System.out.print("Game #: ");
-        int num = Integer.parseInt(scanner.nextLine());
-        GameData game = cache.getByIndex(num);
-        
-        facade.joinGame(state.authToken(),game.gameID(),null);
+
+        int num=Integer.parseInt(scanner.nextLine());
+        GameData game=cache.getByIndex(num);
+
+        System.out.println("Connecting as observer...");
+
+        String url=String.format(
+                "ws://localhost:8080/ws/game/%d?token=%s",
+                game.gameID(),
+                state.authToken()
+        );
+
+        //System.out.println("Observing game...");
+        //facade.joinGame(state.authToken(),game.gameID(),null);
         ChessGame chessGame=new ChessGame();
         chessGame.getBoard().resetBoard();
-        System.out.println("Observing game (white perspective)...");
+        System.out.println("Observing game...");
         BoardRender.drawBoard(chessGame,ChessGame.TeamColor.WHITE);
     }
 }
