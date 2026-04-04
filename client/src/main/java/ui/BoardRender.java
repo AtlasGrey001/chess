@@ -17,7 +17,7 @@ public class BoardRender {
     }
 
     private static void drawWhite(ChessBoard board) {
-        System.out.println("   a  b  c  d  e  f  g  h");
+        System.out.println("   a   b   c  d   e   f   g   h");
         for (int r=8;r>=1;r--) {
             System.out.print(r+" ");
             for (int c=1;c<=8;c++) {
@@ -25,11 +25,11 @@ public class BoardRender {
             }
             System.out.println(" "+r);
         }
-        System.out.println("   a  b  c  d  e  f  g  h");
+        System.out.println("   a   b   c  d   e   f   g   h");
     }
 
     private static void drawBlack(ChessBoard board) {
-        System.out.println("   h  g  f  e  d  c  b  a");
+        System.out.println("   h   g   f  e   d   c   b   a");
         for (int r=1;r<=8;r++) {
             System.out.print(r+" ");
             for (int c=8;c>=1;c--) {
@@ -37,14 +37,14 @@ public class BoardRender {
             }
             System.out.println(" "+r);
         }
-        System.out.println("   h  g  f  e  d  c  b  a");
+        System.out.println("   h   g   f  e   d   c   b   a");
     }
 
     private static void drawSquare(ChessBoard board, int row, int col) {
         boolean light=((row+col)%2==0);
         var piece=board.getPiece(new ChessPosition(row,col));
 
-        String bg=light ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY;
+        String bg=light ? EscapeSequences.SET_BG_COLOR_DARK_GREY : EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
         String symbol=EscapeSequences.EMPTY;
         if (piece!=null) {
             symbol=switch (piece.getTeamColor()) {
