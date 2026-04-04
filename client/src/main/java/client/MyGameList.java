@@ -17,7 +17,7 @@ public class MyGameList {
     public GameData getByIndex(int index1Based) {
         int idx=index1Based-1;
         if (idx<0 || idx>=lastGames.size()) {
-            throw new IllegalArgumentException("Invalid game number");
+            throw new IllegalArgumentException("Invalid game number...");
         }
         return lastGames.get(idx);
     }
