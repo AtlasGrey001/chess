@@ -83,7 +83,7 @@ public class ServerFacade {
         // No response body expected
         if (responseClass==null) {
             if (status>=200 && status<300) {return null;}
-            throw new RuntimeException("Server error");
+            throw new RuntimeException("Wait time exceeded...");
         }
 
         // Read bytes directly from input
@@ -93,7 +93,7 @@ public class ServerFacade {
         //System.out.println("DEBUG JSON = "+json);
 
         if (status>=200 && status<300) {return JsonUtil.fromJson(json, responseClass);}
-        else {throw new RuntimeException("Server error: "+json);}
+        else {throw new RuntimeException("Bad Request...");}
     }
 
 }
