@@ -28,19 +28,19 @@ public class Server {
 
         // EXCEPTIONS
         javalin.exception(BadRequestException.class,(e, ctx)->{
-            ctx.status(400).json(new ErrorResponse("Error: "+e.getMessage()));
+            ctx.status(400).json(new ErrorResponse(e.getMessage()));
         });
         javalin.exception(UnauthorizedException.class,(e, ctx)->{
-            ctx.status(401).json(new ErrorResponse("Error: "+e.getMessage()));
+            ctx.status(401).json(new ErrorResponse(e.getMessage()));
         });
         javalin.exception(AlreadyTakenException.class,(e,ctx)->{
-            ctx.status(403).json(new ErrorResponse("Error: "+e.getMessage()));
+            ctx.status(403).json(new ErrorResponse(e.getMessage()));
         });
         javalin.exception(DataAccessException.class,(e,ctx)->{
-            ctx.status(500).json(new ErrorResponse("Error: "+e.getMessage()));
+            ctx.status(500).json(new ErrorResponse(e.getMessage()));
         });
         javalin.exception(GameNotFoundException.class,(e,ctx)->{
-            ctx.status(400).json(new ErrorResponse("Error: "+e.getMessage()));
+            ctx.status(400).json(new ErrorResponse(e.getMessage()));
         });
 
         // ROUTES
