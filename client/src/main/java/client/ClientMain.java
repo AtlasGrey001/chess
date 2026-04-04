@@ -32,7 +32,7 @@ public class ClientMain {
             case "help"-> printPreloadingHelp();
             case "quit"->{
                 System.out.println("Goodbye.");
-                return;
+                System.exit(0);
             }
             case "login"->doLogin(scanner,facade,state);
             case "register"->doRegister(scanner,facade,state);
@@ -58,7 +58,7 @@ public class ClientMain {
             case "observe game"->gameMenu.observeGame();
             case "quit"->{
                 System.out.println("Goodbye.");
-                return;
+                System.exit(0);
             }
             default->System.out.println("Unknown command. Type 'help'.");
         }
