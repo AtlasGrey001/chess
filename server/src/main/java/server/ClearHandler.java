@@ -19,9 +19,9 @@ public class ClearHandler {
             clearService.clear();
             ctx.status(200).json(new Object());
         } catch (BadRequestException e) {
-            ctx.status(400).json(new ErrorResponse("Error: Bad Request"));
+            ctx.status(400).json(new ErrorResponse("Bad Request"));
         } catch (DataAccessException e) {
-            ctx.status(500).json(new ErrorResponse("Error: "+e.getMessage()));
+            ctx.status(500).json(new ErrorResponse(e.getMessage()));
         }
     }
 }
