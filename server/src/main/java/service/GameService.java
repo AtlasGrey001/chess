@@ -111,4 +111,11 @@ public class GameService {
     public GameData getGameMetadata(int gameID) throws DataAccessException {return dataAccess.getGame(gameID);}
 
     public ChessGame getEngine(int gameID) throws DataAccessException {return dataAccess.getEngine(gameID);}
+
+    public String getUsernameFromAuth(String authToken)
+            throws UnauthorizedException, DataAccessException {
+        AuthData auth=validateAuth(authToken);
+        return auth.username();
+    }
+
 }
