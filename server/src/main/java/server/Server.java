@@ -63,11 +63,16 @@ public class Server {
         // clear database
         javalin.delete("/db",clearHandler::handle);
         // websocket
-        javalin.ws("/ws/game/{gameID}",ws->{
+        javalin.ws("/ws", ws -> {
             ws.onConnect(gameHandler::observeGame);
             ws.onMessage(gameHandler::receiveMessage);
             ws.onClose(gameHandler::disconnect);
         });
+        /**javalin.ws("/ws/game/{gameID}",ws->{
+            ws.onConnect(gameHandler::observeGame);
+            ws.onMessage(gameHandler::receiveMessage);
+            ws.onClose(gameHandler::disconnect);
+        });**/
     }
 
     public int run(int desiredPort) {
