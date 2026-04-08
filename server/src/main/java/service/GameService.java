@@ -73,7 +73,7 @@ public class GameService {
         return auth;
     }
 
-    public GameData getGameRaw(int gameID) throws DataAccessException {return dataAccess.getGame(gameID);}
+    //public GameData getGameRaw(int gameID) throws DataAccessException {return dataAccess.getGame(gameID);}
 
     public GameData makeMove(AuthData auth, int gameID, ChessMove move)
             throws DataAccessException, BadRequestException, InvalidMoveException {
