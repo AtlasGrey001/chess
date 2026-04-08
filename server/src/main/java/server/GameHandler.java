@@ -140,7 +140,7 @@ public class GameHandler {
     }
 
     public void observeGame(WsConnectContext ctx) {}
-    
+
     public void receiveMessage(WsMessageContext ctx) throws IOException {
         UserGameCommand cmd = gson.fromJson(ctx.message(), UserGameCommand.class);
 
@@ -160,7 +160,7 @@ public class GameHandler {
     public void disconnect(WsCloseContext ctx) {
         observers.remove(ctx.session);
     }
-    
+
     private void handleConnect(WsMessageContext ctx, UserGameCommand cmd) throws IOException {
         try {
             var auth = cmd.getAuthToken();
@@ -180,10 +180,10 @@ public class GameHandler {
 
             // Add this session to the game
             observers.add(gameID, ctx.session);
-            
+
             var gameState = buildGetGameResult(data);
             ctx.session.getRemote().sendString(gson.toJson(new LoadGameMessage(gameState)));
-            
+
             String username = gameService.getUsernameFromAuth(auth);
             String role = determineRole(data, username);
             broadcastExcept(ctx.session,gameID,new NotificationMessage(username + " connected as " + role));
@@ -193,11 +193,11 @@ public class GameHandler {
     }
 
     private String determineRole(GameData data, String username) {
-        if (username.equals(data.whiteUsername())) return "WHITE";
-        if (username.equals(data.blackUsername())) return "BLACK";
+        if (username.equals(data.whiteUsername())) {return "WHITE";}
+        if (username.equals(data.blackUsername())) {return "BLACK";}
         return "OBSERVER";
     }
-    
+
     private void handleMakeMove(WsMessageContext ctx, UserGameCommand cmd) throws IOException {
         try {
             String auth = cmd.getAuthToken();
@@ -214,10 +214,10 @@ public class GameHandler {
             AuthData nauth = new AuthData(auth, username);
 
             var updated = gameService.makeMove(nauth, gameID, move);
-            
+
             var gameState = buildGetGameResult(updated);
             broadcast(gameID, new LoadGameMessage(gameState));
-            
+
             broadcastExcept(ctx.session, gameID,
                     new NotificationMessage(username + " made a move"));
 
