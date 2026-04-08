@@ -28,19 +28,19 @@ public class Server {
 
         // EXCEPTIONS
         javalin.exception(BadRequestException.class,(e, ctx)->{
-            ctx.status(400).json(new ErrorResponse(e.getMessage()));
+            ctx.status(400).json(new ErrorResponse("Error "+e.getMessage()));
         });
         javalin.exception(UnauthorizedException.class,(e, ctx)->{
-            ctx.status(401).json(new ErrorResponse(e.getMessage()));
+            ctx.status(401).json(new ErrorResponse("Error "+e.getMessage()));
         });
         javalin.exception(AlreadyTakenException.class,(e,ctx)->{
-            ctx.status(403).json(new ErrorResponse(e.getMessage()));
+            ctx.status(403).json(new ErrorResponse("Error "+e.getMessage()));
         });
         javalin.exception(DataAccessException.class,(e,ctx)->{
-            ctx.status(500).json(new ErrorResponse(e.getMessage()));
+            ctx.status(500).json(new ErrorResponse("Error "+e.getMessage()));
         });
         javalin.exception(GameNotFoundException.class,(e,ctx)->{
-            ctx.status(400).json(new ErrorResponse(e.getMessage()));
+            ctx.status(400).json(new ErrorResponse("Error "+e.getMessage()));
         });
 
         // ROUTES
@@ -63,16 +63,11 @@ public class Server {
         // clear database
         javalin.delete("/db",clearHandler::handle);
         // websocket
-        javalin.ws("/ws", ws -> {
+        javalin.ws("/ws",ws->{
             ws.onConnect(gameHandler::observeGame);
             ws.onMessage(gameHandler::receiveMessage);
             ws.onClose(gameHandler::disconnect);
         });
-        /**javalin.ws("/ws/game/{gameID}",ws->{
-            ws.onConnect(gameHandler::observeGame);
-            ws.onMessage(gameHandler::receiveMessage);
-            ws.onClose(gameHandler::disconnect);
-        });**/
     }
 
     public int run(int desiredPort) {
