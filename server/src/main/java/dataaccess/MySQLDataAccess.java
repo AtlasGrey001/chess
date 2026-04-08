@@ -114,7 +114,7 @@ public class MySQLDataAccess implements DataAccess {
             ps.executeUpdate();
 
             try (var rs=ps.getGeneratedKeys()) {
-                if (!rs.next()) {throw new DataAccessException("Failed to get game ID");}
+                if (!rs.next()) {throw new DataAccessException("Error Failed to get game ID");}
                 int id=rs.getInt(1);
                 return new GameData(id,gameName,null,null,false);
             }
@@ -188,7 +188,7 @@ public class MySQLDataAccess implements DataAccess {
             ps.setBoolean(4,game.gameOver());
             ps.setInt(5,game.gameID());
             if (ps.executeUpdate()==0) {
-                throw new DataAccessException("Game does not exist");
+                throw new DataAccessException("Error Game does not exist");
             }
         } catch (SQLException ex) {
             throw new DataAccessException("Error updating game",ex);
@@ -202,7 +202,7 @@ public class MySQLDataAccess implements DataAccess {
              var ps=conn.prepareStatement(sql)) {
             ps.setInt(1,gameID);
             try (var rs=ps.executeQuery()) {
-                if (!rs.next()) {throw new DataAccessException("Engine does not exist");}
+                if (!rs.next()) {throw new DataAccessException("Error Engine does not exist");}
                 return gson.fromJson(rs.getString("game_state"),ChessGame.class);
             }
         } catch (SQLException ex) {
@@ -220,7 +220,7 @@ public class MySQLDataAccess implements DataAccess {
             ps.setString(1,json);
             ps.setInt(2,gameID);
             if (ps.executeUpdate()==0) {
-                throw new DataAccessException("Engine does not exist");
+                throw new DataAccessException("Error Engine does not exist");
             }
         } catch (SQLException ex) {
             throw new DataAccessException("Error updating engine", ex);
