@@ -17,7 +17,7 @@ import service.results.ListGamesResult;
 import java.util.Collection;
 
 public class GameService {
-    private final DataAccess dataAccess;
+    public final DataAccess dataAccess;
 
     public GameService(DataAccess dataAccess) {this.dataAccess=dataAccess;}
 
@@ -27,7 +27,7 @@ public class GameService {
         if (request.gameName()==null ||
                 request.gameName().isBlank() ||
                 request.gameName().equalsIgnoreCase("null")) {
-            throw new BadRequestException("Bad Request");
+            throw new BadRequestException("Error Bad Request");
         }
         var game=dataAccess.createGame(request.gameName());
         return new CreateGameResult(game.gameID());
@@ -45,18 +45,18 @@ public class GameService {
         var auth=validateAuth(request.authToken());
         if (request.gameID()==null ||
                 request.playerColor()==null || request.playerColor().isBlank()) {
-            throw new BadRequestException("Bad Request");}
+            throw new BadRequestException("Error Bad Request");}
 
         var game=dataAccess.getGame(request.gameID());
-        if (game==null) {throw new BadRequestException("Bad Request");}
+        if (game==null) {throw new BadRequestException("Error Bad Request");}
 
         var color=request.playerColor().toUpperCase();
-        if (!color.equals("WHITE") && !color.equals("BLACK")) {throw new BadRequestException("Bad Request");}
+        if (!color.equals("WHITE") && !color.equals("BLACK")) {throw new BadRequestException("Error Bad Request");}
         if (color.equals("WHITE")) {
-            if (game.whiteUsername()!=null) {throw new AlreadyTakenException("Already Taken");}
+            if (game.whiteUsername()!=null) {throw new AlreadyTakenException("Error Already Taken");}
             dataAccess.updateGame(game.withWhite(auth.username()));
         } else {
-            if (game.blackUsername()!=null) {throw new AlreadyTakenException("Already Taken");}
+            if (game.blackUsername()!=null) {throw new AlreadyTakenException("Error Already Taken");}
             dataAccess.updateGame(game.withBlack(auth.username()));
         }
     }
@@ -66,10 +66,10 @@ public class GameService {
         if (authToken==null ||
                 authToken.isBlank() ||
                 authToken.equalsIgnoreCase("null")) {
-            throw new UnauthorizedException("Unauthorized");}
+            throw new UnauthorizedException("Error Unauthorized");}
         var auth=dataAccess.getAuth(authToken);
         if (auth==null) {
-            throw new UnauthorizedException("Unauthorized");}
+            throw new UnauthorizedException("Error Unauthorized");}
         return auth;
     }
 
@@ -78,17 +78,17 @@ public class GameService {
     public GameData makeMove(AuthData auth, int gameID, ChessMove move)
             throws DataAccessException, BadRequestException, InvalidMoveException {
         var game=dataAccess.getGame(gameID);
-        if (game==null) {throw new BadRequestException("Bad Request");}
-        if (game.gameOver()) {throw new BadRequestException("Game Already Over");}
+        if (game==null) {throw new BadRequestException("Error Bad Request");}
+        if (game.gameOver()) {throw new BadRequestException("Error Game Already Over");}
         var chessGame=dataAccess.getEngine(gameID);
 
         var turn=chessGame.getTeamTurn();
         boolean whiteTurn=(turn==ChessGame.TeamColor.WHITE);
-        if (whiteTurn && !auth.username().equals(game.whiteUsername())) {throw new BadRequestException("Not Your Turn");}
-        if (!whiteTurn && !auth.username().equals(game.blackUsername())) {throw new BadRequestException("Not Your Turn");}
+        if (whiteTurn && !auth.username().equals(game.whiteUsername())) {throw new BadRequestException("Error Not Your Turn");}
+        if (!whiteTurn && !auth.username().equals(game.blackUsername())) {throw new BadRequestException("Error Not Your Turn");}
 
         var legalMoves=chessGame.validMoves(move.getStartPosition());
-        if (legalMoves==null || !legalMoves.contains(move)) {throw new BadRequestException("Illegal Move");}
+        if (legalMoves==null || !legalMoves.contains(move)) {throw new BadRequestException("Error Illegal Move");}
         chessGame.makeMove(move);
         dataAccess.updateEngine(gameID,chessGame);
         return game;
@@ -97,12 +97,12 @@ public class GameService {
     public GameData resign(AuthData auth,int gameID)
             throws DataAccessException, BadRequestException {
         var game=dataAccess.getGame(gameID);
-        if (game==null) {throw new BadRequestException("Bad Request");}
+        if (game==null) {throw new BadRequestException("Error Bad Request");}
         boolean isWhite=auth.username().equals(game.whiteUsername());
         boolean isBlack=auth.username().equals(game.blackUsername());
 
-        if (!isWhite && !isBlack) {throw new BadRequestException("Not A Player");}
-        if (game.gameOver()) {throw new BadRequestException("Game Already Over");}
+        if (!isWhite && !isBlack) {throw new BadRequestException("Error Not A Player");}
+        if (game.gameOver()) {throw new BadRequestException("Error Game Already Over");}
         var updated=game.withGameOver(true);
         dataAccess.updateGame(updated);
         return updated;
