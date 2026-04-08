@@ -32,11 +32,11 @@ public class UserService {
                 request.password().equalsIgnoreCase("null") ||
                 request.email()==null || request.email().isBlank() ||
                 request.email().equalsIgnoreCase("null")) {
-            throw new BadRequestException("Error Bad Request");
+            throw new BadRequestException("Bad Request");
         }
         var existing=dataAccess.getUser(request.username());
         if (existing!=null) {
-            throw new AlreadyTakenException("Error Already Taken");
+            throw new AlreadyTakenException("Already Taken");
         }
 
         String hash=BCrypt.hashpw(request.password(),BCrypt.gensalt());
@@ -54,11 +54,11 @@ public class UserService {
         if (request==null ||
                 request.username()==null || request.username().isBlank() ||
                 request.password()==null || request.password().isBlank()) {
-            throw new BadRequestException("Error Bad Request");}
+            throw new BadRequestException("Bad Request");}
         var user=dataAccess.getUser(request.username());
-        if (user==null) {throw new UnauthorizedException("Error Unauthorized");}
+        if (user==null) {throw new UnauthorizedException("Unauthorized");}
         if (!BCrypt.checkpw(request.password(),user.password())) {
-            throw new UnauthorizedException("Error Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
 
         var token=UUID.randomUUID().toString();
@@ -71,11 +71,11 @@ public class UserService {
             throws DataAccessException, UnauthorizedException {
         var authToken=request.authToken();
         if (authToken==null||authToken.isBlank()) {
-            throw new UnauthorizedException("Error Unauthorized");}
+            throw new UnauthorizedException("Unauthorized");}
 
         var auth=dataAccess.getAuth(authToken);
         if (auth==null) {
-            throw new UnauthorizedException("Error Unauthorized");}
+            throw new UnauthorizedException("Unauthorized");}
         dataAccess.deleteAuth(authToken);
     }
 }
