@@ -8,7 +8,6 @@ public class DatabaseManager {
     private static String dbUsername;
     private static String dbPassword;
     private static String connectionUrl;
-
     /*
      * Load the database information for the db.properties file.
      */
@@ -48,14 +47,14 @@ public class DatabaseManager {
             conn.setCatalog(databaseName);
             return conn;
         } catch (SQLException ex) {
-            throw new DataAccessException("failed to get connection", ex);
+            throw new DataAccessException("Error: failed to get connection", ex);
         }
     }
 
     private static void loadPropertiesFromResources() {
         try (var propStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("db.properties")) {
             if (propStream == null) {
-                throw new Exception("Unable to load db.properties");
+                throw new Exception("Error: Unable to load db.properties");
             }
             Properties props = new Properties();
             props.load(propStream);
